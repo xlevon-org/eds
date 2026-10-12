@@ -1,0 +1,43 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-error.log*
+
+# Build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Env / secrets (templates are tracked)
+.env
+.env.*
+!.env.example
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Generated handbook artifacts (regenerable)
+generated/
+python-worker/artifacts/
+backend/tmp/
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+
+# Local logs
+*.log

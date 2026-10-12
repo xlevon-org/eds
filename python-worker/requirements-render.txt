@@ -1,0 +1,7 @@
+# Optional render stack — installed separately because WeasyPrint needs native
+# libraries (Pango/GTK) that are not available by default, especially on Windows.
+#   Windows: install the GTK3 runtime and put its bin/ on PATH.
+#   Linux (Debian/Ubuntu): apt-get install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 libffi-dev
+# The generation pipeline degrades gracefully to HTML-only when this is absent.
+
+weasyprint>=66

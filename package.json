@@ -1,0 +1,20 @@
+{
+  "name": "up-handbook-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "up — AI handbook/tute generation studio (React frontend, Express API, Python agentic generation worker).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "install:all": "npm --prefix frontend install && npm --prefix backend install",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "dev:backend": "npm --prefix backend run dev",
+    "start:backend": "npm --prefix backend run start",
+    "lint:backend": "npm --prefix backend run lint",
+    "worker:setup": "python -m venv python-worker/.venv && python-worker/.venv/Scripts/python -m pip install -r python-worker/requirements.txt",
+    "worker:dev": "python-worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir python-worker"
+  }
+}

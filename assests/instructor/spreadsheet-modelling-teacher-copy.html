@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spreadsheet Modelling Teacher Copy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#F5F8F7; --surface:#FFFFFF; --ink:#172321; --muted:#566663; --line:#D6E0DD; --grid:#E6EDEB; --head:#EEF3F1;
+  --accent:#107A5C; --accent-ink:#FFFFFF; --accent-soft:#DDF1E9;
+  --red:#C8352F; --red-soft:#FBE4E2; --gold:#FFF1BF; --gold-ink:#6B5300; --blue:#2A63B0; --blue-soft:#E1ECFA;
+  --ok:#1C7C45; --ok-soft:#DDF3E5; --bad:#B8322C; --bad-soft:#FBE3E1;
+  --sans:"Lexend",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --paper:#0F1715; --surface:#16211E; --ink:#E4EDEA; --muted:#98ABA6; --line:#2A3A36; --grid:#22302C; --head:#1C2926;
+    --accent:#4FC49A; --accent-ink:#0F1715; --accent-soft:#173A2F;
+    --red:#FF7B72; --red-soft:#3A1E1C; --gold:#3A3217; --gold-ink:#F2D679; --blue:#7FB0F0; --blue-soft:#18273D;
+    --ok:#5FD08D; --ok-soft:#173424; --bad:#FF857D; --bad-soft:#3A1E1C;}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+  --paper:#0F1715; --surface:#16211E; --ink:#E4EDEA; --muted:#98ABA6; --line:#2A3A36; --grid:#22302C; --head:#1C2926;
+  --accent:#4FC49A; --accent-ink:#0F1715; --accent-soft:#173A2F;
+  --red:#FF7B72; --red-soft:#3A1E1C; --gold:#3A3217; --gold-ink:#F2D679; --blue:#7FB0F0; --blue-soft:#18273D;
+  --ok:#5FD08D; --ok-soft:#173424; --bad:#FF857D; --bad-soft:#3A1E1C;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.65 var(--sans);padding-inline:16px;padding-block:0 80px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;line-height:1.2;margin:0}
+h2{font-size:clamp(24px,3.6vw,32px);font-weight:800;letter-spacing:-.01em}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+code,.mono{font-family:var(--mono);font-size:.92em}
+.f{font-family:var(--mono);font-size:.9em;background:var(--gold);color:var(--gold-ink);padding:1px 6px;border-radius:4px;white-space:nowrap}
+.red{color:var(--red);font-weight:700}
+
+/* hero */
+.hero{padding-block:36px 24px;display:grid;gap:16px}
+.crumb{display:flex;flex-wrap:wrap;gap:8px;font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.crumb span{padding:6px 10px;border-radius:4px;background:var(--ink);color:var(--paper)}
+.crumb span+span{background:var(--red);color:#fff}
+.hero h1{font-size:clamp(34px,6vw,56px);font-weight:800;letter-spacing:-.02em}
+.hero .fbar{max-width:640px}
+.lede{max-width:62ch;color:var(--muted);font-size:18px}
+
+/* formula bar look */
+.fbar{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-family:var(--mono);font-size:14px;overflow:hidden}
+.fbar .ref{padding:8px 12px;border-right:1px solid var(--line);background:var(--head);min-width:64px;text-align:center;font-weight:600}
+.fbar .fx{padding:8px 10px;border-right:1px solid var(--line);color:var(--muted);font-style:italic}
+.fbar .val{padding:8px 12px;flex:1;overflow-x:auto;white-space:nowrap}
+
+/* nav */
+.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:1px solid var(--line);padding-block:8px;margin-bottom:8px}
+.toc nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+.toc a{flex:none;display:inline-flex;gap:6px;align-items:center;text-decoration:none;color:var(--ink);font-size:14px;font-weight:500;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.toc a b{font:600 11px var(--mono);color:var(--accent)}
+.toc a:hover{border-color:var(--accent)}
+
+/* sections */
+section.part{padding-block:36px 8px;display:grid;gap:18px;scroll-margin-top:60px}
+.phead{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.cell-tag{font:600 13px/1 var(--mono);padding:6px 8px;border:1px solid var(--accent);color:var(--accent);border-radius:4px;background:var(--surface)}
+.prose{display:grid;gap:12px;max-width:70ch}
+p.prose{display:block}
+.card{align-content:start}
+.card{min-width:0;grid-template-columns:minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:12px}
+ul.clean{margin:0;padding-left:1.2em;display:grid;gap:6px}
+ol.clean{margin:0;padding-left:1.4em;display:grid;gap:6px}
+.label{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.callout.warn{border-color:var(--red);background:var(--red-soft)}
+.callout.info{border-color:var(--blue);background:var(--blue-soft)}
+.defn{font-size:18px}
+.defn b{color:var(--accent)}
+
+/* objectives */
+.obj{display:grid;gap:8px;counter-reset:o;margin:0;padding:0;list-style:none}
+.obj li{display:flex;gap:12px;align-items:flex-start}
+.obj li::before{counter-increment:o;content:counter(o);flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 14px var(--mono)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:14px;padding:4px 10px;border-radius:999px;background:var(--head);border:1px solid var(--line)}
+
+/* glossary */
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr));gap:12px}
+.term{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.term .t{font-weight:700;font-size:17px;display:flex;justify-content:space-between;gap:8px}
+.term .t small{font:600 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.term .d{font-size:15px;color:var(--ink)}
+.term .eg{font-size:14px;color:var(--muted)}
+.gloss.hide-defs .term:not(.show) .d,.gloss.hide-defs .term:not(.show) .eg{filter:blur(6px);user-select:none}
+.term:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* sheets */
+.sheet-wrap{display:grid;gap:10px}
+.sheet-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table.sheet{border-collapse:collapse;font-size:15px;min-width:100%;font-variant-numeric:tabular-nums}
+table.sheet th,table.sheet td{border:1px solid var(--grid);padding:0;height:34px;white-space:nowrap}
+table.sheet thead th{background:var(--head);font:600 12px var(--mono);color:var(--muted);padding:4px 8px}
+table.sheet tbody th{background:var(--head);font:600 12px var(--mono);color:var(--muted);width:38px;text-align:center}
+table.sheet td>div{padding:5px 10px;cursor:pointer;min-width:60px}
+table.sheet td.lbl>div{font-weight:500}
+table.sheet td.hdr>div{font-weight:700}
+table.sheet td.num>div{text-align:right}
+table.sheet td.fx>div{color:var(--red);font-weight:700;text-align:right}
+table.sheet td.fx.showf>div{color:var(--ink);font-weight:500;font-family:var(--mono);font-size:13px;background:var(--gold);text-align:left}
+table.sheet td.sel{outline:2px solid var(--accent);outline-offset:-2px}
+table.sheet td input{width:100%;min-width:84px;border:0;background:var(--accent-soft);color:var(--ink);font:inherit;padding:5px 10px;text-align:right;height:33px}
+table.sheet td input:focus{outline:2px solid var(--accent);outline-offset:-2px}
+.key{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.key i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+.status{font-weight:700;padding:10px 14px;border-radius:8px}
+.status.loss{background:var(--bad-soft);color:var(--bad)}
+.status.profit{background:var(--ok-soft);color:var(--ok)}
+.status.even{background:var(--head)}
+
+/* buttons & inputs */
+button{font:inherit}
+.btn{font:600 15px var(--sans);padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.small{font-size:13px;padding:5px 10px}
+.btn:focus-visible,.opt:focus-visible,.sortbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+input.txt,select.txt{font:inherit;font-size:16px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+input.mono{font-family:var(--mono);font-size:15px}
+.fb{font-size:15px;font-weight:600;min-height:1.4em}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+
+/* what-if */
+.wi-buttons{display:flex;flex-wrap:wrap;gap:8px}
+table.log{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+table.log th,table.log td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+table.log td.n{text-align:right}
+table.log th{font:600 12px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* goal seek dialog */
+.gs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.dialog{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.dialog .bar{background:var(--ink);color:var(--paper);font-weight:700;font-size:15px;padding:8px 14px;text-align:center}
+.dialog .body{padding:16px;display:grid;gap:12px}
+.dialog label{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;font-size:15px}
+.dialog .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.result{font-family:var(--mono);font-size:14px;background:var(--head);border-radius:8px;padding:12px 14px;white-space:pre-wrap;min-height:90px}
+
+/* fill blanks */
+.bank{display:flex;flex-wrap:wrap;gap:6px}
+.bank span{font:600 14px var(--mono);padding:4px 10px;border:1px dashed var(--accent);border-radius:6px;color:var(--accent)}
+.bank span.used{opacity:.4;text-decoration:line-through}
+.blanks{display:grid;gap:12px;margin:0;padding-left:1.6em}
+.blanks li{line-height:2.1}
+.blanks input{font:600 15px var(--sans);width:9.5em;padding:3px 8px;border:none;border-bottom:2px solid var(--muted);background:var(--head);color:var(--ink);border-radius:4px 4px 0 0}
+.blanks input.ok{border-color:var(--ok);background:var(--ok-soft)}
+.blanks input.bad{border-color:var(--bad);background:var(--bad-soft)}
+
+/* sort */
+.sort{display:grid;gap:8px}
+.sitem{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.sitem.ok{border-color:var(--ok);background:var(--ok-soft)}
+.sitem.bad{border-color:var(--bad);background:var(--bad-soft)}
+.sortbtn{font:600 13px var(--sans);padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--head);color:var(--ink);cursor:pointer}
+.sortbtn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.compare{border-collapse:collapse;width:100%;font-size:15px}
+.compare th,.compare td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+.compare th{background:var(--head)}
+
+/* formula tasks */
+.ftask{display:grid;gap:8px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.ftask .q{font-weight:500}
+.ftask .in{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ftask .in input{flex:1;min-width:180px}
+
+/* quiz */
+.quiz{display:grid;gap:14px}
+.qq{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:10px}
+.qq .opts{display:grid;gap:6px}
+.opt{text-align:left;font:500 15px var(--sans);padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);cursor:pointer}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.why{font-size:14px;color:var(--muted)}
+.score{font-weight:700;font-size:18px}
+
+/* laptop tasks */
+.task{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:12px}
+.task .tt{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.task .tt .pill{font:600 12px var(--mono);padding:4px 8px;border-radius:4px;background:var(--ink);color:var(--paper)}
+.steps{margin:0;padding-left:1.4em;display:grid;gap:6px}
+.steps li::marker{font-weight:700;color:var(--accent)}
+.checkrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.checkrow input{width:110px}
+details.ans{border:1px dashed var(--line);border-radius:8px;padding:8px 12px}
+details.ans summary{cursor:pointer;font-weight:600;color:var(--accent)}
+
+/* success */
+.sc{display:grid;gap:8px;list-style:none;margin:0;padding:0}
+.sc label{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+.sc input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:3px}
+.meter{height:10px;border-radius:999px;background:var(--head);overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+
+@media (max-width:720px){.gs{grid-template-columns:1fr}.dialog label{grid-template-columns:1fr}body{font-size:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="hero" id="start">
+  <div class="crumb"><span>Unit 3: Processing Data</span><span>Lesson 6</span><span style="background:var(--gold);color:var(--gold-ink)">Teacher copy · all answers</span></div>
+  <h1>Spreadsheet Modelling</h1>
+  <p class="lede">Learn how a spreadsheet can copy a real-life situation, so you can test ideas and predict what will happen before you do it for real.</p>
+  <div class="fbar" aria-hidden="true"><span class="ref">A1</span><span class="fx">fx</span><span class="val">=LEARN(models, formulas, what if, goal seek)</span></div>
+</header>
+
+<div class="toc">
+  <nav aria-label="Lesson sections">
+    <a href="#key"><b>KEY</b>Answer key</a>
+    <a href="#objectives"><b>A1</b>Objectives</a>
+    <a href="#keywords"><b>A2</b>Keywords</a>
+    <a href="#model"><b>A3</b>What is a model?</a>
+    <a href="#formulas"><b>A4</b>Formulas &amp; functions</a>
+    <a href="#numerical"><b>A5</b>Numerical model</a>
+    <a href="#financial"><b>A6</b>Financial model</a>
+    <a href="#whatif"><b>A7</b>What if</a>
+    <a href="#goalseek"><b>A8</b>Goal seek</a>
+    <a href="#retail"><b>A9</b>Retail &amp; wholesale</a>
+    <a href="#blanks"><b>A10</b>Fill the blanks</a>
+    <a href="#write"><b>A11</b>Write the formula</a>
+    <a href="#quiz"><b>A12</b>Quiz</a>
+    <a href="#laptop"><b>A13</b>Laptop tasks</a>
+    <a href="#review"><b>A14</b>Success criteria</a>
+  </nav>
+</div>
+
+<section class="part" id="key">
+  <div class="phead"><span class="cell-tag">KEY</span><h2>Teacher answer key</h2></div>
+  <div class="callout warn"><b>Teacher copy.</b> Every activity below is already completed with the correct answers. This summary lists them all in one place.</div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>A3 · Spot the variables</h3>
+      <table class="compare">
+        <tr><th>Item</th><th>Variable?</th></tr>
+        <tr><td>Selling price of one milkshake</td><td>Yes</td></tr>
+        <tr><td>Number of milkshakes sold each day</td><td>Yes</td></tr>
+        <tr><td>Cost of the milk</td><td>Yes</td></tr>
+        <tr><td>Shop costs for each day</td><td>Yes</td></tr>
+        <tr><td>The = sign</td><td>No</td></tr>
+        <tr><td>The name of the SUM function</td><td>No</td></tr>
+        <tr><td>The column letters A, B, C</td><td>No</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>A4 · Function machine (12, 7, 20, 3, 8)</h3>
+      <table class="compare">
+        <tr><th>Function</th><th>Result</th></tr>
+        <tr><td><span class="f">=SUM(A1:A5)</span></td><td class="red">50</td></tr>
+        <tr><td><span class="f">=AVERAGE(A1:A5)</span></td><td class="red">10</td></tr>
+        <tr><td><span class="f">=MIN(A1:A5)</span></td><td class="red">3</td></tr>
+        <tr><td><span class="f">=MAX(A1:A5)</span></td><td class="red">20</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>A5 · Numerical model</h3>
+      <table class="compare">
+        <tr><th>Cell</th><th>Formula</th><th>Answer</th></tr>
+        <tr><td>F1</td><td><span class="f">=SUM(B2:B13)</span></td><td class="red">210</td></tr>
+        <tr><td>F2</td><td>250 (typed)</td><td>250</td></tr>
+        <tr><td>F3</td><td><span class="f">=F2-F1</span></td><td class="red">40</td></tr>
+        <tr><td>F4</td><td><span class="f">=AVERAGE(B2:B13)</span></td><td class="red">17.5</td></tr>
+        <tr><td>F5</td><td><span class="f">=MIN(B2:B13)</span></td><td class="red">5</td></tr>
+        <tr><td>F6</td><td><span class="f">=MAX(B2:B13)</span></td><td class="red">30</td></tr>
+      </table>
+      <p><b>Target met?</b> No, 40 km short.</p>
+    </div>
+    <div class="card">
+      <h3>A5 · “Try these changes”</h3>
+      <ol class="clean">
+        <li>Dec = 70: total becomes 250, so the distance remaining is <b class="red">0</b>. The target is met exactly.</li>
+        <li>Jan = 1: total <b class="red">206</b>, remaining <b class="red">44</b>, average <b class="red">17.17</b>, lowest <b class="red">1</b>. Highest stays 30. F1, F3, F4 and F5 change.</li>
+        <li>Any distances that add up to 250 work, for example raising Dec to 70, or adding 10 km to Sep, Oct, Nov and Dec.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>A6 · Financial model</h3>
+      <table class="compare">
+        <tr><th>Cell</th><th>Formula</th><th>Answer</th></tr>
+        <tr><td>B11 Build total</td><td><span class="f">=SUM(B1:B10)</span></td><td class="red">$709.00</td></tr>
+        <tr><td>D1 Staff build cost</td><td>typed</td><td>$150.00</td></tr>
+        <tr><td>D2 Total cost</td><td><span class="f">=B11+D1</span></td><td class="red">$859.00</td></tr>
+        <tr><td>D3 Retail price</td><td>typed</td><td>$799.00</td></tr>
+        <tr><td>D4 Profit</td><td><span class="f">=D3-D2</span></td><td class="red">-$60.00</td></tr>
+      </table>
+      <p>The cost is higher than the retail price, so the shop makes a <b>loss</b>.</p>
+      <p class="why">SUM ignores the text in B1, so =SUM(B2:B10) gives the same answer.</p>
+    </div>
+    <div class="card">
+      <h3>A7 · What if scenarios</h3>
+      <table class="compare">
+        <tr><th>Scenario</th><th>Total cost</th><th>Profit</th></tr>
+        <tr><td>Book’s values</td><td>$859.00</td><td class="red">-$60.00</td></tr>
+        <tr><td>Components 10% cheaper (build total $638.10)</td><td>$788.10</td><td class="red">$10.90</td></tr>
+        <tr><td>Staff build cost $100</td><td>$809.00</td><td class="red">-$10.00</td></tr>
+        <tr><td>Retail price $899</td><td>$859.00</td><td class="red">$40.00</td></tr>
+      </table>
+      <p>Raising the retail price to $899 gives the biggest profit.</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>A8 · Goal seek challenges</h3>
+      <table class="compare">
+        <tr><th>Goal</th><th>Answer</th></tr>
+        <tr><td>D4 = 50 by changing D1</td><td class="red">$40.00</td></tr>
+        <tr><td>D4 = 100 by changing D3</td><td class="red">$959.00</td></tr>
+        <tr><td>D4 = 0 by changing D3</td><td class="red">$859.00</td></tr>
+        <tr><td>D4 = 100 by changing D1</td><td class="red">-$10.00 (impossible)</td></tr>
+      </table>
+      <p class="why">Challenge 4: a cost cannot be below $0, so the shop cannot make $100 profit by changing the staff cost alone. The book’s screenshot uses a target of 50, which gives a staff build cost of $40.</p>
+    </div>
+    <div class="card">
+      <h3>A9 · Retail or wholesale?</h3>
+      <table class="compare">
+        <tr><th>Statement</th><th>Answer</th></tr>
+        <tr><td>Sells directly to us, the consumers</td><td>Retail</td></tr>
+        <tr><td>Sells only to retail companies</td><td>Wholesale</td></tr>
+        <tr><td>The cheaper price</td><td>Wholesale</td></tr>
+        <tr><td>Includes the costs of a shop, staff or website</td><td>Retail</td></tr>
+        <tr><td>Buyer buys lots of stock (fifty computers)</td><td>Wholesale</td></tr>
+        <tr><td>Price at the supermarket checkout</td><td>Retail</td></tr>
+        <tr><td>The more expensive price</td><td>Retail</td></tr>
+        <tr><td>Price a supermarket pays another company</td><td>Wholesale</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>A10 · Fill in the blanks</h3>
+      <ol class="clean">
+        <li>model, variables</li><li>equals (=)</li><li>SUM</li><li>AVERAGE</li><li>MIN, MAX</li><li>cost</li>
+        <li>loss</li><li>what if</li><li>Goal seek</li><li>retail, wholesale</li><li>stock</li><li>function</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>A12 · Quiz</h3>
+      <ol class="clean">
+        <li>The equals sign (=)</li><li>MAX</li><li>40</li><li>17.5</li><li>$859</li><li>A loss of $60</li>
+        <li>What if the staff build cost could be reduced?</li><li>Goal seek</li><li>Retail companies buy lots of stock</li><li>Consumers like us</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>A13 · Laptop tasks</h3>
+    <table class="compare">
+      <tr><th>Task</th><th>Answers</th></tr>
+      <tr><td>1 · Numerical model</td><td>F1 210 · F3 40 · F4 17.5 · F5 5 · F6 30 · With Dec = 70, remaining = 0</td></tr>
+      <tr><td>2 · Financial model</td><td>B11 $709.00 · D2 $859.00 · D4 -$60.00</td></tr>
+      <tr><td>3 · What if</td><td>A $10.90 · B -$10.00 · C $40.00 (C is the best)</td></tr>
+      <tr><td>4 · Goal seek</td><td>D1 = $40.00 for $50 profit · D3 = $959.00 for $100 profit</td></tr>
+      <tr><td>5 · Milkshake shop</td><td>B6 =SUM(B2:B5) → 1.50 · E3 =E1*E2 → 120 · E4 =B6*E2 → 60 · E6 =E3-E4-E5 → 30 · 60 sold → profit 60 · Goal seek price for $50 profit → $3.50</td></tr>
+      <tr><td>Extension</td><td>Open task. Check that SUM, AVERAGE, MAX and MIN use the right ranges, that money left = budget − total, and that goal seek changes the food cell.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Common mistakes to watch for</h3>
+    <ul class="clean">
+      <li>Forgetting the <b>=</b>, so the cell shows the formula as text.</li>
+      <li>Typing answers as numbers (like 210) instead of formulas, so the model does not update in a what if.</li>
+      <li>Writing profit the wrong way round (=D2-D3 gives $60 instead of -$60).</li>
+      <li>Using a comma instead of a colon in a range (B2,B13 only uses two cells).</li>
+      <li>Mixing up what if (change a value, see the result) and goal seek (choose the result, find the value).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- A1 -->
+<section class="part" id="objectives">
+  <div class="phead"><span class="cell-tag">A1</span><h2>Learning objectives</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <span class="label">By the end of this lesson you will</span>
+      <ol class="obj">
+        <li>Understand how spreadsheet modelling can be used to model real-life situations.</li>
+        <li>Demonstrate understanding through the creation of a simple spreadsheet model.</li>
+        <li>Demonstrate an understanding of the terms <b>‘what if’ scenario</b> and <b>‘goal seek’</b>.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <span class="label">Related topics</span>
+      <div class="chips"><span class="chip">Using variables</span><span class="chip">Real-world scenarios</span><span class="chip">Arithmetic operators</span></div>
+      <span class="label">Keywords</span>
+      <div class="chips">
+        <span class="chip">AVERAGE</span><span class="chip">equals sign (=)</span><span class="chip">formula</span><span class="chip">function</span><span class="chip">goal seek</span><span class="chip">MAX</span><span class="chip">MIN</span><span class="chip">models</span><span class="chip">profit</span><span class="chip">SUM</span><span class="chip">what if scenario</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A2 -->
+<section class="part" id="keywords">
+  <div class="phead"><span class="cell-tag">A2</span><h2>Keywords and definitions</h2></div>
+  <div class="sheet-tools">
+    <button class="btn ghost small" id="glossTest" type="button" aria-pressed="false">Test yourself: hide definitions</button>
+    <span class="why" id="glossHint" hidden>Say the meaning out loud, then click a card to check.</span>
+  </div>
+  <div class="gloss" id="gloss"></div>
+</section>
+
+<!-- A3 -->
+<section class="part" id="model">
+  <div class="phead"><span class="cell-tag">A3</span><h2>What is a spreadsheet model?</h2></div>
+  <div class="callout defn">A <b>spreadsheet model</b> allows the user to <b>change variables</b> in a spreadsheet in order to <b>recreate a real situation</b> and <b>predict the result</b> of a situation or scenario.</div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Examples of simple models</h3>
+      <p>These models use arithmetic <b>formulas</b> or spreadsheet <b>functions</b>:</p>
+      <ul class="clean">
+        <li>The potential <b>profit or loss</b> that could be made by a new shop selling milkshakes.</li>
+        <li>The potential <b>cost of decorating a home</b> by pricing materials and equipment.</li>
+        <li>The potential <b>grade outcomes</b> of students based on previous assessments.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Real-world example</h3>
+      <p>Families sometimes create a simple spreadsheet model to record their <b>weekly spending</b>. They can use this to plan ahead and look for ways to save money.</p>
+      <div class="callout info"><b>Variable:</b> a value in the model that you can change, such as a price or a distance. When a variable changes, every formula that uses it updates by itself.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Quick check: spot the variables</h3>
+    <p>In a milkshake shop model, which of these could you <b>change</b> to test ideas? Click every one you think is a variable.</p>
+    <div class="sort" id="varSpot"></div>
+    <div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" id="varCheck" type="button">Check</button><button class="btn ghost small" id="varReset" type="button">Reset</button></div>
+    <p class="fb" id="varFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- A4 -->
+<section class="part" id="formulas">
+  <div class="phead"><span class="cell-tag">A4</span><h2>Formulas and functions</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>The equals sign (=)</h3>
+      <p>Every formula and function <b>must start with =</b>. It tells the spreadsheet “calculate this”.</p>
+      <table class="compare">
+        <tr><th>You type</th><th>The cell shows</th></tr>
+        <tr><td><span class="f">F2-F1</span></td><td>F2-F1 &nbsp;(just text)</td></tr>
+        <tr><td><span class="f">=F2-F1</span></td><td class="red">40</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Arithmetic operators</h3>
+      <table class="compare">
+        <tr><th>Operator</th><th>Meaning</th><th>Example</th></tr>
+        <tr><td><code>+</code></td><td>Add</td><td><span class="f">=B11+D1</span></td></tr>
+        <tr><td><code>-</code></td><td>Subtract</td><td><span class="f">=D3-D2</span></td></tr>
+        <tr><td><code>*</code></td><td>Multiply</td><td><span class="f">=B2*2</span></td></tr>
+        <tr><td><code>/</code></td><td>Divide</td><td><span class="f">=F1/12</span></td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Formula or function?</h3>
+      <p>A <b>formula</b> is a calculation you write yourself using cell references and operators, such as <span class="f">=F2-F1</span>.</p>
+      <p>A <b>function</b> is a ready-made formula with a name. You give it a range of cells and it does the work, such as <span class="f">=SUM(B2:B13)</span>.</p>
+      <div class="callout info"><b>Reading a range:</b> <code>B2:B13</code> means “every cell from B2 down to B13”.</div>
+    </div>
+    <div class="card">
+      <h3>The four functions in this lesson</h3>
+      <table class="compare">
+        <tr><th>Function</th><th>What it does</th></tr>
+        <tr><td><span class="f">=SUM( )</span></td><td>Adds up all the numbers</td></tr>
+        <tr><td><span class="f">=AVERAGE( )</span></td><td>Finds the mean (total ÷ how many)</td></tr>
+        <tr><td><span class="f">=MIN( )</span></td><td>Finds the lowest number</td></tr>
+        <tr><td><span class="f">=MAX( )</span></td><td>Finds the highest number</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Try it: function machine</h3>
+    <p>Change the numbers in cells A1 to A5, then choose a function.</p>
+    <div class="scroll"><table class="sheet" id="fmTable"></table></div>
+    <div class="sheet-tools">
+      <button class="btn small fm" data-fn="SUM" type="button">SUM</button>
+      <button class="btn small fm" data-fn="AVERAGE" type="button">AVERAGE</button>
+      <button class="btn small fm" data-fn="MIN" type="button">MIN</button>
+      <button class="btn small fm" data-fn="MAX" type="button">MAX</button>
+    </div>
+    <div class="fbar"><span class="ref">A6</span><span class="fx">fx</span><span class="val" id="fmFormula">Choose a function</span></div>
+    <p>Result: <span class="red" id="fmResult">–</span> <span class="why" id="fmWhy"></span></p>
+  </div>
+</section>
+
+<!-- A5 -->
+<section class="part" id="numerical">
+  <div class="phead"><span class="cell-tag">A5</span><h2>A simple numerical model</h2></div>
+  <p class="prose">This model shows it is possible to gradually increase the distance run each month to meet an <b>annual target of 250 km</b>. The answers are shown in <span class="red">red</span>. The green cells are variables: change them and watch the answers update.</p>
+  <div class="sheet-wrap" id="sheetNum"></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>What the model tells us</h3>
+      <ul class="clean">
+        <li>Total run in the year: <span class="red" data-out="num:F1">210</span> km</li>
+        <li>Still needed to reach the target: <span class="red" data-out="num:F3">40</span> km</li>
+        <li id="numVerdict"></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Try these changes</h3>
+      <ol class="clean">
+        <li>Change <b>Dec</b> (B13) to <b>70</b>. What is the distance remaining now?</li>
+        <li>Change <b>Jan</b> (B2) to <b>1</b>. Which answers change?</li>
+        <li>Can you find distances that meet the target exactly? (Distance remaining = 0)</li>
+      </ol>
+      <button class="btn ghost small" type="button" data-reset="num">Reset to the book’s values</button>
+    </div>
+  </div>
+</section>
+
+<!-- A6 -->
+<section class="part" id="financial">
+  <div class="phead"><span class="cell-tag">A6</span><h2>A simple financial model</h2></div>
+  <p class="prose">This model calculates the cost of building a computer for a small computer shop and the potential <b>profit</b>.</p>
+  <div class="grid3">
+    <div class="card"><span class="label">Build total</span><p>Add up the price of every component.<br><span class="f">=SUM(B1:B10)</span></p></div>
+    <div class="card"><span class="label">Total cost</span><p>Build total plus the staff build cost.<br><span class="f">=B11+D1</span></p></div>
+    <div class="card"><span class="label">Profit</span><p>Retail price minus total cost.<br><span class="f">=D3-D2</span></p></div>
+  </div>
+  <div class="sheet-wrap" id="sheetFin"></div>
+  <p class="status" id="finStatus" aria-live="polite"></p>
+  <div class="callout warn">In the book’s example the profit is <b>−$60</b>. The cost of building the computer is higher than the retail price, so the shop would make a <b>loss</b>.</div>
+</section>
+
+<!-- A7 -->
+<section class="part" id="whatif">
+  <div class="phead"><span class="cell-tag">A7</span><h2>What if scenarios</h2></div>
+  <div class="callout defn">One of the key benefits of a model is being able to see what might happen <b>before having to actually do it</b>. Changing a value to test an idea is called a <b>what if scenario</b>.</div>
+  <div class="card">
+    <h3>Be the shop owner</h3>
+    <p>Click a scenario. The financial model above changes, and the result is added to your table.</p>
+    <div class="wi-buttons">
+      <button class="btn small" type="button" data-wi="cheaper">What if the components can be bought 10% cheaper?</button>
+      <button class="btn small" type="button" data-wi="staff">What if the staff build cost is reduced to $100?</button>
+      <button class="btn small" type="button" data-wi="retail">What if the retail price is increased to $899?</button>
+      <button class="btn ghost small" type="button" data-wi="reset">Back to the book’s values</button>
+    </div>
+    <div class="scroll"><table class="log" id="wiLog">
+      <thead><tr><th>Scenario</th><th>Total cost</th><th>Retail price</th><th>Profit</th></tr></thead><tbody></tbody>
+    </table></div>
+    <p class="why">You can also type your own values in the green cells of the financial model and click “Record my scenario”.</p>
+    <div><button class="btn ghost small" type="button" id="wiMine">Record my scenario</button></div>
+  </div>
+</section>
+
+<!-- A8 -->
+<section class="part" id="goalseek">
+  <div class="phead"><span class="cell-tag">A8</span><h2>The goal seek function</h2></div>
+  <div class="callout defn">Spreadsheet software includes a <b>goal seek</b> function that can <b>adjust a variable until a desired outcome is created</b>. You choose the answer you want, and the spreadsheet works backwards to find the value that gives it.</div>
+  <div class="grid2">
+    <div class="card">
+      <h3>What if vs goal seek</h3>
+      <table class="compare">
+        <tr><th>What if</th><th>Goal seek</th></tr>
+        <tr><td>You change a value and look at the result.</td><td>You choose the result and the spreadsheet finds the value.</td></tr>
+        <tr><td>“What if the staff cost is $100?”</td><td>“What staff cost gives a profit of $50?”</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Where to find it</h3>
+      <ul class="clean">
+        <li><b>Microsoft Excel:</b> Data → What-If Analysis → Goal Seek</li>
+        <li><b>LibreOffice Calc:</b> Tools → Goal Seek</li>
+      </ul>
+      <p class="why">You fill in three boxes: the cell with the answer (Set cell), the answer you want (To value), and the cell it may change (By changing cell).</p>
+    </div>
+  </div>
+  <div class="gs">
+    <div class="dialog">
+      <div class="bar">Goal Seek</div>
+      <div class="body">
+        <label for="gsSet">Set cell <select class="txt" id="gsSet"><option value="D4">D4 (Profit)</option><option value="D2">D2 (Total cost)</option></select></label>
+        <label for="gsTo">To value <input class="txt" id="gsTo" type="number" value="50"></label>
+        <label for="gsBy">By changing cell <select class="txt" id="gsBy"><option value="D1">D1 (Staff build cost)</option><option value="D3">D3 (Retail price)</option><option value="B9">B9 (Monitor)</option></select></label>
+        <div class="row"><button class="btn" type="button" id="gsRun">OK</button><button class="btn ghost" type="button" id="gsCancel">Cancel</button></div>
+      </div>
+    </div>
+    <div class="dialog">
+      <div class="bar">Goal Seeking Status</div>
+      <div class="body">
+        <div class="result" id="gsResult" aria-live="polite">Fill in the Goal Seek box and click OK.</div>
+        <div class="row"><button class="btn small" type="button" id="gsKeep" disabled>Keep this value</button><button class="btn ghost small" type="button" id="gsUndo" disabled>Undo</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Goal seek challenges</h3>
+    <p class="why">Start each challenge from the book’s values (click “Back to the book’s values” in A7).</p>
+    <ol class="clean">
+      <li>Set D4 to <b>50</b> by changing D1. What staff build cost gives a $50 profit? <span class="checkrow"><input class="txt" id="gc1" type="number" aria-label="Answer 1"><button class="btn small" type="button" data-gc="gc1" data-a="40">Check</button><span class="fb" id="gc1fb"></span></span></li>
+      <li>Set D4 to <b>100</b> by changing D3. What retail price gives a $100 profit? <span class="checkrow"><input class="txt" id="gc2" type="number" aria-label="Answer 2"><button class="btn small" type="button" data-gc="gc2" data-a="959">Check</button><span class="fb" id="gc2fb"></span></span></li>
+      <li>Set D4 to <b>0</b> by changing D3. What is the lowest retail price with no loss? <span class="checkrow"><input class="txt" id="gc3" type="number" aria-label="Answer 3"><button class="btn small" type="button" data-gc="gc3" data-a="859">Check</button><span class="fb" id="gc3fb"></span></span></li>
+      <li>Set D4 to <b>100</b> by changing D1. Why is the answer impossible in real life? <details class="ans"><summary>Show answer</summary>Goal seek gives a staff build cost of <b>−$10</b>. A cost cannot be less than $0, so the shop cannot make $100 profit by only changing the staff cost. It must also buy cheaper components or raise the retail price.</details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- A9 -->
+<section class="part" id="retail">
+  <div class="phead"><span class="cell-tag">A9</span><h2>Retail and wholesale prices</h2></div>
+  <div class="prose">
+    <p>In the financial model, the profit from a computer is calculated by taking away the total build cost from the <b>retail</b> price. This is correct if we are buying products directly from the people that make them.</p>
+    <p>However, supermarkets don’t make all the food they sell, and a website selling laptops may not have built them all themselves. Companies that buy products from other companies, so they can sell them to us, buy their products at a <b>wholesale</b> price.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <span class="label">Retail price</span>
+      <p class="defn"><b>Retailers</b> sell products directly to us, the consumers, at a retail price.</p>
+      <p>It is <b>more expensive</b> than wholesale because it includes the price the retailer paid to buy the product <b>and</b> their costs to be able to sell it, such as a shop, staff or website.</p>
+    </div>
+    <div class="card">
+      <span class="label">Wholesale price</span>
+      <p class="defn"><b>Wholesalers</b> sell products only to retail companies at a wholesale price.</p>
+      <p>It is <b>cheaper</b> because retail companies buy lots of stock, for example fifty computers instead of one.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Sort it: retail or wholesale?</h3>
+    <div class="sort" id="rwSort"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" id="rwCheck" type="button">Check</button><button class="btn ghost small" id="rwReset" type="button">Reset</button></div>
+    <p class="fb" id="rwFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- A10 -->
+<section class="part" id="blanks">
+  <div class="phead"><span class="cell-tag">A10</span><h2>Fill in the blanks</h2></div>
+  <div class="card">
+    <span class="label">Word bank</span>
+    <div class="bank" id="bank"></div>
+    <ol class="blanks" id="blankList"></ol>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="blCheck" type="button">Check my answers</button><button class="btn ghost" id="blShow" type="button">Show answers</button><button class="btn ghost" id="blReset" type="button">Clear</button></div>
+    <p class="fb" id="blFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- A11 -->
+<section class="part" id="write">
+  <div class="phead"><span class="cell-tag">A11</span><h2>Write the formula</h2></div>
+  <p class="prose">Type the formula you would put in each cell. Use the book’s values for both models. Remember to start with <b>=</b>.</p>
+  <div class="grid2" id="ftasks"></div>
+</section>
+
+<!-- A12 -->
+<section class="part" id="quiz">
+  <div class="phead"><span class="cell-tag">A12</span><h2>Quick quiz</h2></div>
+  <div class="quiz" id="quizBox"></div>
+  <div class="card"><p class="score" id="quizScore">Score: 0 / 0</p><div><button class="btn ghost small" id="quizReset" type="button">Try again</button></div></div>
+</section>
+
+<!-- A13 -->
+<section class="part" id="laptop">
+  <div class="phead"><span class="cell-tag">A13</span><h2>Laptop tasks</h2></div>
+  <p class="prose">Open <b>Microsoft Excel</b>, <b>LibreOffice Calc</b> or <b>Google Sheets</b>. Build each model yourself, then type your answers here to check them.</p>
+  <div id="tasks" style="display:grid;gap:16px"></div>
+</section>
+
+<!-- A14 -->
+<section class="part" id="review">
+  <div class="phead"><span class="cell-tag">A14</span><h2>Further investigation and success criteria</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Further investigation</h3>
+      <ul class="clean">
+        <li>Create a similar version of the example spreadsheets shown in this lesson and experiment with your own values instead.</li>
+        <li>Research real-life component prices to add to the computer model and recommend a new retail price if needed.</li>
+        <li>Investigate what other costs might need to be included in a shop based model.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Success criteria</h3>
+      <ul class="sc" id="scList">
+        <li><label><input type="checkbox" id="sc1"> I know how to create a simple numerical spreadsheet model.</label></li>
+        <li><label><input type="checkbox" id="sc2"> I know how to create a simple financial spreadsheet model.</label></li>
+        <li><label><input type="checkbox" id="sc3"> I know what a <i>what if</i> scenario is and what the goal seek tool is used for.</label></li>
+        <li><label><input type="checkbox" id="sc4"> I know what the difference is between a retail and wholesale price.</label></li>
+      </ul>
+      <div class="meter" aria-hidden="true"><i id="scMeter"></i></div>
+      <p class="why" id="scText">0 of 4 ticked</p>
+    </div>
+  </div>
+</section>
+
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function el(tag,attrs,html){var e=document.createElement(tag);if(attrs)for(var k in attrs){if(k==='class')e.className=attrs[k];else e.setAttribute(k,attrs[k]);}if(html!=null)e.innerHTML=html;return e;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function money(v){if(typeof v!=='number'||isNaN(v))return '';var s=Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');return (v<0?'-$':'$')+s;}
+function plain(v){if(typeof v!=='number'||isNaN(v))return '';return String(Math.round(v*100)/100);}
+function near(a,b){return Math.abs(a-b)<0.011;}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
+
+/* ---------- formula engine ---------- */
+function colNum(c){return c.charCodeAt(0)-64;}
+function refsInRange(a,b){
+  var ma=/^([A-Z])(\d+)$/.exec(a),mb=/^([A-Z])(\d+)$/.exec(b);if(!ma||!mb)throw new Error('range');
+  var c1=Math.min(colNum(ma[1]),colNum(mb[1])),c2=Math.max(colNum(ma[1]),colNum(mb[1]));
+  var r1=Math.min(+ma[2],+mb[2]),r2=Math.max(+ma[2],+mb[2]),out=[];
+  for(var c=c1;c<=c2;c++)for(var r=r1;r<=r2;r++)out.push(String.fromCharCode(64+c)+r);return out;
+}
+function evalFormula(src,get){
+  var s=String(src).trim();
+  if(s[0]!=='=')throw new Error('noeq');
+  var e=s.slice(1).toUpperCase().replace(/\s+/g,'').replace(/×/g,'*').replace(/÷/g,'/');
+  var guard=0;
+  while(/(SUM|AVERAGE|MIN|MAX)\(([^()]*)\)/.test(e)&&guard++<20){
+    e=e.replace(/(SUM|AVERAGE|MIN|MAX)\(([^()]*)\)/,function(m,fn,args){
+      var nums=[];
+      args.split(',').forEach(function(a){
+        if(!a)return;
+        if(a.indexOf(':')>-1){var p=a.split(':');refsInRange(p[0],p[1]).forEach(function(r){var v=get(r);if(typeof v==='number'&&!isNaN(v))nums.push(v);});}
+        else if(/^[A-Z]\d+$/.test(a)){var v=get(a);if(typeof v==='number')nums.push(v);}
+        else if(/^-?\d+(\.\d+)?$/.test(a))nums.push(parseFloat(a));
+        else throw new Error('arg');
+      });
+      var r;
+      if(fn==='SUM')r=nums.reduce(function(x,y){return x+y},0);
+      else if(!nums.length)r=0;
+      else if(fn==='AVERAGE')r=nums.reduce(function(x,y){return x+y},0)/nums.length;
+      else if(fn==='MIN')r=Math.min.apply(null,nums);
+      else r=Math.max.apply(null,nums);
+      return '('+r+')';
+    });
+  }
+  e=e.replace(/\b([A-Z])(\d+)\b/g,function(m){var v=get(m);return '('+(typeof v==='number'?v:0)+')';});
+  if(!/^[\d+\-*/().]+$/.test(e))throw new Error('syntax');
+  var v=Function('"use strict";return ('+e+')')();
+  if(typeof v!=='number'||!isFinite(v))throw new Error('math');
+  return v;
+}
+
+/* ---------- sheet model + view ---------- */
+function Model(spec){this.spec=spec;this.reset();}
+Model.prototype.reset=function(){this.vals={};for(var r in this.spec.cells){var c=this.spec.cells[r];if(c.edit)this.vals[r]=c.v;}};
+Model.prototype.get=function(ref,seen){
+  var c=this.spec.cells[ref];if(!c)return undefined;
+  if(c.edit)return this.vals[ref];
+  if(c.f){seen=seen||{};if(seen[ref])return 0;seen[ref]=1;var self=this;
+    try{return evalFormula(c.f,function(r){return self.get(r,seen)});}catch(e){return NaN;}}
+  return c.t;
+};
+
+function SheetView(host,model,opts){
+  this.host=host;this.m=model;this.opts=opts||{};this.showF=false;this.listeners=[];this.build();
+}
+SheetView.prototype.fmt=function(ref,v){var c=this.m.spec.cells[ref];if(typeof v!=='number')return v==null?'':esc(v);return c&&c.money?money(v):plain(v);};
+SheetView.prototype.build=function(){
+  var self=this,sp=this.m.spec,id=sp.id;
+  var tools=el('div',{'class':'sheet-tools'});
+  var tog=el('button',{'class':'btn ghost small',type:'button','aria-pressed':'false'},'Show formulas');
+  tog.addEventListener('click',function(){self.showF=!self.showF;tog.setAttribute('aria-pressed',self.showF);tog.textContent=self.showF?'Show answers':'Show formulas';self.refresh();});
+  var rst=el('button',{'class':'btn ghost small',type:'button'},'Reset');
+  rst.addEventListener('click',function(){self.m.reset();self.syncInputs();self.refresh();});
+  tools.appendChild(tog);tools.appendChild(rst);
+  var key=el('div',{'class':'key'},'<span><i style="background:var(--accent-soft)"></i>Variable (you can change it)</span><span><i style="background:var(--surface)"></i>Label</span><span><i style="background:var(--red)"></i>Answer from a formula</span>');
+  tools.appendChild(key);
+  this.bar=el('div',{'class':'fbar'},'<span class="ref">–</span><span class="fx">fx</span><span class="val">Click a cell to see what is inside it</span>');
+  var sc=el('div',{'class':'scroll'});var t=el('table',{'class':'sheet'});
+  var h='<thead><tr><th></th>';sp.cols.forEach(function(c){h+='<th scope="col">'+c+'</th>'});h+='</tr></thead><tbody>';
+  for(var r=1;r<=sp.rows;r++){h+='<tr><th scope="row">'+r+'</th>';
+    sp.cols.forEach(function(c){var ref=c+r,cell=sp.cells[ref],cls=[];
+      if(!cell){h+='<td data-ref="'+ref+'"><div>&nbsp;</div></td>';return;}
+      if(cell.edit){h+='<td class="num" data-ref="'+ref+'"><input type="number" step="any" id="'+id+'-'+ref+'" aria-label="'+ref+'" value="'+cell.v+'"></td>';return;}
+      if(cell.f)cls.push('fx');else if(cell.hdr)cls.push('hdr');else cls.push('lbl');
+      h+='<td class="'+cls.join(' ')+'" data-ref="'+ref+'"><div></div></td>';});
+    h+='</tr>';}
+  t.innerHTML=h+'</tbody>';sc.appendChild(t);this.table=t;
+  this.host.appendChild(tools);this.host.appendChild(this.bar);this.host.appendChild(sc);
+  t.addEventListener('input',function(e){var inp=e.target;if(inp.tagName!=='INPUT')return;var ref=inp.closest('td').dataset.ref;var v=parseFloat(inp.value);self.m.vals[ref]=isNaN(v)?0:v;self.refresh();self.select(ref);});
+  t.addEventListener('click',function(e){var td=e.target.closest('td');if(td)self.select(td.dataset.ref);});
+  t.addEventListener('focusin',function(e){var td=e.target.closest('td');if(td)self.select(td.dataset.ref);});
+  this.refresh();
+};
+SheetView.prototype.select=function(ref){
+  $$('td.sel',this.table).forEach(function(x){x.classList.remove('sel')});
+  var td=$('td[data-ref="'+ref+'"]',this.table);if(td)td.classList.add('sel');
+  var c=this.m.spec.cells[ref],txt='(empty)';
+  if(c){if(c.f)txt=c.f+'   →   '+this.fmt(ref,this.m.get(ref));else if(c.edit)txt=this.m.vals[ref]+'   (a variable: type a new value)';else txt=c.t;}
+  $('.ref',this.bar).textContent=ref;$('.val',this.bar).innerHTML=esc(txt).replace('→','→');
+};
+SheetView.prototype.syncInputs=function(){var self=this;$$('input',this.table).forEach(function(i){var ref=i.closest('td').dataset.ref;i.value=self.m.vals[ref];});};
+SheetView.prototype.refresh=function(){
+  var self=this,sp=this.m.spec;
+  $$('td[data-ref]',this.table).forEach(function(td){var ref=td.dataset.ref,c=sp.cells[ref];if(!c||c.edit)return;var d=td.firstChild;
+    if(c.f){td.classList.toggle('showf',self.showF);d.textContent=self.showF?c.f:'';if(!self.showF)d.innerHTML=self.fmt(ref,self.m.get(ref));}
+    else d.textContent=c.t;});
+  this.listeners.forEach(function(fn){fn()});
+};
+SheetView.prototype.onChange=function(fn){this.listeners.push(fn);fn();};
+
+/* ---------- data: numerical model ---------- */
+var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],dist=[5,5,10,10,15,15,20,20,25,25,30,30];
+var numCells={A1:{t:'Month',hdr:1},B1:{t:'Distance',hdr:1}};
+months.forEach(function(m,i){numCells['A'+(i+2)]={t:m};numCells['B'+(i+2)]={v:dist[i],edit:1};});
+[['Annual total (km)','=SUM(B2:B13)'],['Annual target (km)',250],['Distance remaining (km)','=F2-F1'],['Average (km)','=AVERAGE(B2:B13)'],['Lowest (km)','=MIN(B2:B13)'],['Highest (km)','=MAX(B2:B13)']].forEach(function(p,i){
+  numCells['D'+(i+1)]={t:p[0]};numCells['F'+(i+1)]=typeof p[1]==='number'?{v:p[1],edit:1}:{f:p[1]};});
+var numModel=new Model({id:'num',cols:['A','B','C','D','E','F'],rows:13,cells:numCells});
+
+/* ---------- data: financial model ---------- */
+var comps=[['Central Processing Unit',75],['Motherboard',90],['Memory',50],['Hard drive',100],['Power supply unit',75],['Video card',65],['Case',79],['Monitor',150],['Keyboard & mouse',25]];
+var finCells={A1:{t:'Component',hdr:1},B1:{t:'Price ($)',hdr:1},A11:{t:'Build total',hdr:1},B11:{f:'=SUM(B1:B10)',money:1},
+  C1:{t:'Staff build cost',hdr:1},D1:{v:150,edit:1,money:1},C2:{t:'Total cost',hdr:1},D2:{f:'=B11+D1',money:1},
+  C3:{t:'Retail price',hdr:1},D3:{v:799,edit:1,money:1},C4:{t:'Profit',hdr:1},D4:{f:'=D3-D2',money:1}};
+comps.forEach(function(c,i){finCells['A'+(i+2)]={t:c[0]};finCells['B'+(i+2)]={v:c[1],edit:1,money:1};});
+var finModel=new Model({id:'fin',cols:['A','B','C','D'],rows:11,cells:finCells});
+
+var numView=new SheetView($('#sheetNum'),numModel);
+var finView=new SheetView($('#sheetFin'),finModel);
+
+numView.onChange(function(){
+  $$('[data-out^="num:"]').forEach(function(s){s.textContent=plain(numModel.get(s.dataset.out.split(':')[1]))});
+  var rem=numModel.get('F3'),v=$('#numVerdict');
+  if(rem>0)v.innerHTML='Target <b>not met</b> yet: <span class="red">'+plain(rem)+' km</span> short.';
+  else if(near(rem,0))v.innerHTML='Target <b>met exactly</b>. Well planned!';
+  else v.innerHTML='Target <b>beaten</b> by <span class="red">'+plain(-rem)+' km</span>.';
+});
+$$('[data-reset="num"]').forEach(function(b){b.addEventListener('click',function(){numModel.reset();numView.syncInputs();numView.refresh();})});
+
+finView.onChange(function(){
+  var p=finModel.get('D4'),s=$('#finStatus');
+  s.className='status '+(p<0?'loss':(near(p,0)?'even':'profit'));
+  s.textContent=p<0?('Loss of '+money(-p)+'. The total cost is higher than the retail price.'):(near(p,0)?'No profit and no loss. The retail price exactly covers the total cost.':('Profit of '+money(p)+'. The retail price is higher than the total cost.'));
+});
+
+/* ---------- glossary ---------- */
+var terms=[
+ ['Model','Keyword','A spreadsheet that recreates a real-life situation, so you can change variables and predict what will happen.','e.g. the profit or loss of a new milkshake shop'],
+ ['Formula','Keyword','A calculation you type into a cell using cell references and operators. It always starts with =.','e.g. =F2-F1'],
+ ['Equals sign (=)','Keyword','The sign that starts every formula and function. It tells the spreadsheet to calculate.','e.g. =B11+D1'],
+ ['Function','Keyword','A ready-made formula with a name that does a job for you, such as adding up a range of cells.','e.g. SUM, AVERAGE, MIN, MAX'],
+ ['SUM','Keyword','A function that adds up all the numbers in a range of cells.','e.g. =SUM(B2:B13) gives 210'],
+ ['AVERAGE','Keyword','A function that finds the mean: it adds the numbers, then divides by how many numbers there are.','e.g. =AVERAGE(B2:B13) gives 17.5'],
+ ['MIN','Keyword','A function that finds the lowest (smallest) number in a range.','e.g. =MIN(B2:B13) gives 5'],
+ ['MAX','Keyword','A function that finds the highest (biggest) number in a range.','e.g. =MAX(B2:B13) gives 30'],
+ ['Profit','Keyword','The money left over after the costs are taken away from the selling price. Profit = retail price − total cost.','e.g. =D3-D2'],
+ ['What if scenario','Keyword','Changing a value in a model to see what might happen before doing it for real.','e.g. What if the retail price is increased?'],
+ ['Goal seek','Keyword','A spreadsheet tool that adjusts a variable until a desired outcome (target) is created.','e.g. find the staff cost that gives a $50 profit'],
+ ['Variable','Also know','A value in a model that can be changed. Formulas that use it update automatically.','e.g. staff build cost, retail price'],
+ ['Loss','Also know','When the total cost is higher than the selling price, so the profit is a negative number.','e.g. profit of −$60'],
+ ['Retail price','Also know','The price retailers charge us, the consumers. It includes what they paid plus their costs, such as a shop, staff or website.','e.g. the price at a supermarket'],
+ ['Wholesale price','Also know','The cheaper price wholesalers charge retail companies, because they buy lots of stock.','e.g. fifty computers instead of one']
+];
+var g=$('#gloss');
+terms.forEach(function(t){var b=el('button',{'class':'term',type:'button'},'<span class="t">'+esc(t[0])+'<small>'+t[1]+'</small></span><span class="d">'+esc(t[2])+'</span><span class="eg">'+esc(t[3])+'</span>');
+  b.addEventListener('click',function(){if(g.classList.contains('hide-defs'))b.classList.toggle('show')});g.appendChild(b);});
+$('#glossTest').addEventListener('click',function(){var on=g.classList.toggle('hide-defs');this.setAttribute('aria-pressed',on);this.textContent=on?'Show all definitions':'Test yourself: hide definitions';$('#glossHint').hidden=!on;$$('.term',g).forEach(function(x){x.classList.remove('show')});});
+
+/* ---------- spot the variables ---------- */
+var vars=[['The selling price of one milkshake',1],['The number of milkshakes sold each day',1],['The = sign at the start of a formula',0],['The cost of the milk',1],['The name of the SUM function',0],['The shop costs for each day',1],['The column letters A, B, C',0]];
+var vs=$('#varSpot');
+vars.forEach(function(v,i){var d=el('div',{'class':'sitem'},'<span>'+esc(v[0])+'</span>');var b=el('button',{'class':'sortbtn',type:'button','aria-pressed':'false'},'Variable?');
+  b.addEventListener('click',function(){var on=b.classList.toggle('on');b.setAttribute('aria-pressed',on);b.textContent=on?'Variable ✓':'Variable?';d.classList.remove('ok','bad');});
+  d.appendChild(b);d.dataset.a=v[1];vs.appendChild(d);});
+$('#varCheck').addEventListener('click',function(){var right=0;$$('.sitem',vs).forEach(function(d){var on=$('.sortbtn',d).classList.contains('on');var ok=(on?1:0)==+d.dataset.a;d.classList.toggle('ok',ok);d.classList.toggle('bad',!ok);if(ok)right++;});
+  var f=$('#varFb');f.className='fb '+(right===vars.length?'ok':'bad');f.textContent=right+' of '+vars.length+' correct. '+(right===vars.length?'Prices, amounts and costs are variables: you can change them to test ideas.':'Hint: a variable is a value (a number) you could change.');});
+$('#varReset').addEventListener('click',function(){$$('.sitem',vs).forEach(function(d){d.classList.remove('ok','bad');var b=$('.sortbtn',d);b.classList.remove('on');b.textContent='Variable?';});$('#varFb').textContent='';});
+
+/* ---------- function machine ---------- */
+var fmVals=[12,7,20,3,8],fmFn=null,fmT=$('#fmTable');
+(function(){var h='<thead><tr><th></th><th>A</th></tr></thead><tbody>';fmVals.forEach(function(v,i){h+='<tr><th>'+(i+1)+'</th><td class="num"><input type="number" step="any" id="fm-'+i+'" aria-label="A'+(i+1)+'" value="'+v+'"></td></tr>';});
+  h+='<tr><th>6</th><td class="fx"><div id="fmCell">&nbsp;</div></td></tr></tbody>';fmT.innerHTML=h;})();
+function fmRun(){if(!fmFn)return;var nums=$$('input',fmT).map(function(i){return parseFloat(i.value)||0});
+  var v=evalFormula('='+fmFn+'(A1:A5)',function(r){return nums[+r.slice(1)-1]});
+  $('#fmFormula').textContent='='+fmFn+'(A1:A5)';$('#fmResult').textContent=plain(v);$('#fmCell').textContent=plain(v);
+  var list=nums.join(', ');var why={SUM:'because '+nums.join(' + ')+' = '+plain(v),AVERAGE:'because the total '+plain(nums.reduce(function(a,b){return a+b},0))+' ÷ 5 = '+plain(v),MIN:'is the lowest of '+list,MAX:'is the highest of '+list}[fmFn];
+  $('#fmWhy').textContent='('+(fmFn==='MIN'||fmFn==='MAX'?plain(v)+' ':'')+why+')';}
+$$('.fm').forEach(function(b){b.addEventListener('click',function(){fmFn=b.dataset.fn;fmRun();})});
+fmT.addEventListener('input',fmRun);
+
+/* ---------- what if ---------- */
+function logRow(name){var tb=$('#wiLog tbody'),p=finModel.get('D4');
+  var tr=el('tr',null,'<td>'+esc(name)+'</td><td class="n">'+money(finModel.get('D2'))+'</td><td class="n">'+money(finModel.get('D3'))+'</td><td class="n" style="color:'+(p<0?'var(--bad)':'var(--ok)')+';font-weight:700">'+money(p)+'</td>');tb.appendChild(tr);}
+function finReset(){finModel.reset();finView.syncInputs();finView.refresh();}
+$$('[data-wi]').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.wi;finReset();
+  if(k==='cheaper'){for(var i=2;i<=10;i++)finModel.vals['B'+i]=Math.round(finModel.vals['B'+i]*0.9*100)/100;}
+  if(k==='staff')finModel.vals.D1=100;
+  if(k==='retail')finModel.vals.D3=899;
+  finView.syncInputs();finView.refresh();
+  logRow(k==='reset'?'Book’s values':b.textContent.replace('What if ','').replace('?',''));
+  if(k!=='reset')$('#sheetFin').scrollIntoView({behavior:'smooth',block:'center'});});});
+$('#wiMine').addEventListener('click',function(){logRow('My scenario');});
+logRow('Book’s values');
+
+/* ---------- goal seek ---------- */
+var gsPrev=null;
+$('#gsRun').addEventListener('click',function(){
+  var set=$('#gsSet').value,by=$('#gsBy').value,target=parseFloat($('#gsTo').value),out=$('#gsResult');
+  if(isNaN(target)){out.textContent='Type a number in “To value”.';return;}
+  var x0=finModel.vals[by];gsPrev={by:by,v:x0};
+  finModel.vals[by]=x0;var f0=finModel.get(set);finModel.vals[by]=x0+1;var f1=finModel.get(set);var slope=f1-f0;
+  if(slope===0){finModel.vals[by]=x0;out.textContent='Goal seek could not find a solution.\nChanging '+by+' does not change '+set+'.';return;}
+  var x=Math.round((x0+(target-f0)/slope)*100)/100;finModel.vals[by]=x;finView.syncInputs();finView.refresh();
+  var name=$('#gsBy').selectedOptions[0].textContent;
+  var msg='Goal Seeking with Cell '+set+'\nfound a solution.\n\n   Target value: '+target+'\n   Current value: '+money(finModel.get(set))+'\n\n'+name+' changed from '+money(x0)+' to '+money(x)+'.';
+  if(x<0)msg+='\n\nNote: a price or cost cannot be less than $0,\nso this goal is not realistic by changing only '+by+'.';
+  out.textContent=msg;$('#gsKeep').disabled=false;$('#gsUndo').disabled=false;
+});
+$('#gsCancel').addEventListener('click',function(){$('#gsTo').value=50;$('#gsSet').value='D4';$('#gsBy').value='D1';$('#gsResult').textContent='Fill in the Goal Seek box and click OK.';});
+$('#gsKeep').addEventListener('click',function(){$('#gsResult').textContent+='\n\nValue kept in the model.';this.disabled=true;$('#gsUndo').disabled=true;gsPrev=null;});
+$('#gsUndo').addEventListener('click',function(){if(gsPrev){finModel.vals[gsPrev.by]=gsPrev.v;finView.syncInputs();finView.refresh();}$('#gsResult').textContent='Change undone. The model is back to how it was.';this.disabled=true;$('#gsKeep').disabled=true;gsPrev=null;});
+$$('[data-gc]').forEach(function(b){b.addEventListener('click',function(){var id=b.dataset.gc,v=parseFloat($('#'+id).value),a=parseFloat(b.dataset.a),f=$('#'+id+'fb');
+  if(isNaN(v)){f.className='fb bad';f.textContent='Type a number first.';return;}
+  var ok=near(v,a);f.className='fb '+(ok?'ok':'bad');f.textContent=ok?'Correct: '+money(a):'Not yet. Try it in the Goal Seek box above.';});});
+
+/* ---------- retail / wholesale sort ---------- */
+var rw=[['Sells products directly to us, the consumers','R'],['Sells products only to retail companies','W'],['The cheaper price','W'],['Includes the costs of a shop, staff or website','R'],['The buyer buys lots of stock, such as fifty computers','W'],['The price you pay at the supermarket checkout','R'],['The more expensive price','R'],['The price a supermarket pays when it buys food from another company','W']];
+var rs=$('#rwSort');
+rw.forEach(function(it){var d=el('div',{'class':'sitem'},'<span>'+esc(it[0])+'</span>');d.dataset.a=it[1];var g2=el('span',{'class':'chips'});
+  [['R','Retail'],['W','Wholesale']].forEach(function(o){var b=el('button',{'class':'sortbtn',type:'button','aria-pressed':'false'},o[1]);b.dataset.v=o[0];
+    b.addEventListener('click',function(){$$('.sortbtn',d).forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false')});b.classList.add('on');b.setAttribute('aria-pressed','true');d.classList.remove('ok','bad');});g2.appendChild(b);});
+  d.appendChild(g2);rs.appendChild(d);});
+$('#rwCheck').addEventListener('click',function(){var right=0,done=0;$$('.sitem',rs).forEach(function(d){var on=$('.sortbtn.on',d);if(!on){d.classList.remove('ok','bad');return;}done++;var ok=on.dataset.v===d.dataset.a;d.classList.toggle('ok',ok);d.classList.toggle('bad',!ok);if(ok)right++;});
+  var f=$('#rwFb');f.className='fb '+(right===rw.length?'ok':'bad');f.textContent=right+' of '+rw.length+' correct'+(done<rw.length?' ('+(rw.length-done)+' not answered yet)':'')+'.';});
+$('#rwReset').addEventListener('click',function(){$$('.sitem',rs).forEach(function(d){d.classList.remove('ok','bad');$$('.sortbtn',d).forEach(function(x){x.classList.remove('on')})});$('#rwFb').textContent='';});
+
+/* ---------- fill in the blanks ---------- */
+var blanks=[
+ ['A spreadsheet ',['model'],' lets you change ',['variables','variable'],' to recreate a real situation and predict the result.'],
+ ['Every formula must start with the ',['equals','=','equal'],' sign.'],
+ ['The function ',['SUM'],' adds up all the numbers in a range of cells.'],
+ ['The function ',['AVERAGE'],' adds the numbers, then divides by how many numbers there are.'],
+ ['',['MIN'],' finds the lowest value and ',['MAX'],' finds the highest value.'],
+ ['Profit = retail price − total ',['cost','costs'],'.'],
+ ['If the total cost is higher than the retail price, the shop makes a ',['loss'],'.'],
+ ['Testing “What if the retail price is increased?” is called a ',['what if','what-if','whatif'],' scenario.'],
+ ['',['Goal seek','goalseek','goal-seek'],' adjusts a variable until a desired outcome is created.'],
+ ['Retailers sell to consumers at a ',['retail'],' price. Wholesalers sell to retail companies at a cheaper ',['wholesale'],' price.'],
+ ['Wholesale prices are cheaper because retail companies buy lots of ',['stock'],'.'],
+ ['A ready-made formula with a name, such as SUM, is called a ',['function'],'.']
+];
+var bankWords=['model','variables','equals','SUM','AVERAGE','MIN','MAX','cost','loss','what if','goal seek','retail','wholesale','stock','function'];
+var bank=$('#bank');bankWords.slice().sort().forEach(function(w){bank.appendChild(el('span',{'data-w':w.toLowerCase()},esc(w)))});
+var bl=$('#blankList'),bi=0;
+blanks.forEach(function(parts){var li=el('li');parts.forEach(function(p){if(typeof p==='string')li.appendChild(document.createTextNode(p));else{var inp=el('input',{type:'text',id:'blank'+(bi++),autocomplete:'off',spellcheck:'false','aria-label':'Blank'});inp.dataset.a=JSON.stringify(p);li.appendChild(inp);}});bl.appendChild(li);});
+function normW(s){return String(s).toLowerCase().replace(/\s+/g,' ').trim();}
+$('#blCheck').addEventListener('click',function(){var right=0,all=$$('input',bl);all.forEach(function(i){var a=JSON.parse(i.dataset.a).map(normW),ok=a.indexOf(normW(i.value))>-1;i.classList.toggle('ok',ok);i.classList.toggle('bad',!ok);if(ok)right++;});
+  $$('span',bank).forEach(function(s){var used=all.some(function(i){return i.classList.contains('ok')&&JSON.parse(i.dataset.a).map(normW).indexOf(s.dataset.w)>-1});s.classList.toggle('used',used)});
+  var f=$('#blFb');f.className='fb '+(right===all.length?'ok':'bad');f.textContent='You got '+right+' out of '+all.length+'.'+(right===all.length?' Excellent!':' Fix the red boxes and check again.');});
+$('#blShow').addEventListener('click',function(){$$('input',bl).forEach(function(i){i.value=JSON.parse(i.dataset.a)[0];i.classList.add('ok');i.classList.remove('bad');});$$('span',bank).forEach(function(s){s.classList.add('used')});$('#blFb').textContent='';});
+$('#blReset').addEventListener('click',function(){$$('input',bl).forEach(function(i){i.value='';i.classList.remove('ok','bad')});$$('span',bank).forEach(function(s){s.classList.remove('used')});$('#blFb').textContent='';});
+
+/* ---------- write the formula ---------- */
+var numRef=new Model(numModel.spec),finRef=new Model(finModel.spec);
+var ftasks=[
+ [numRef,'F1','Numerical model: the annual total distance.','SUM',210,'=SUM(B2:B13)'],
+ [numRef,'F3','Numerical model: the distance remaining to reach the target.',null,40,'=F2-F1'],
+ [numRef,'F4','Numerical model: the average distance per month.','AVERAGE',17.5,'=AVERAGE(B2:B13)'],
+ [numRef,'F5','Numerical model: the lowest distance.','MIN',5,'=MIN(B2:B13)'],
+ [numRef,'F6','Numerical model: the highest distance.','MAX',30,'=MAX(B2:B13)'],
+ [finRef,'B11','Financial model: the build total of all components.','SUM',709,'=SUM(B1:B10)'],
+ [finRef,'D2','Financial model: the total cost (build total + staff build cost).',null,859,'=B11+D1'],
+ [finRef,'D4','Financial model: the profit (retail price − total cost).',null,-60,'=D3-D2']
+];
+var fh=$('#ftasks');
+ftasks.forEach(function(t,i){var box=el('div',{'class':'ftask'},'<span class="label">Cell '+t[1]+'</span><p class="q">'+esc(t[2])+'</p><div class="in"><input class="txt mono" id="ft'+i+'" type="text" autocomplete="off" spellcheck="false" placeholder="=..." aria-label="Formula for '+t[1]+'"><button class="btn small" type="button">Check</button><button class="btn ghost small" type="button">Hint</button></div><p class="fb" aria-live="polite"></p>');
+  var inp=$('input',box),bs=$$('button',box),fb=$('.fb',box);
+  function check(){var s=inp.value.trim();fb.className='fb bad';
+    if(!s){fb.textContent='Type a formula first.';return;}
+    if(s[0]!=='='){fb.textContent='Remember: every formula must start with the equals sign (=).';return;}
+    var v;try{v=evalFormula(s,function(r){return t[0].get(r)});}catch(e){fb.textContent='The spreadsheet cannot understand this. Check the brackets, the colon (:) and the cell names.';return;}
+    if(!/[A-Z]\d+/i.test(s)){fb.textContent='Use cell references (like B2 or F1), not typed numbers, so the model updates when values change.';return;}
+    if(t[3]&&s.toUpperCase().indexOf(t[3]+'(')<0){fb.textContent='This gives '+(t[0]===finRef?money(v):plain(v))+'. Try using the '+t[3]+' function.';return;}
+    if(near(v,t[4])){fb.className='fb ok';fb.textContent='Correct! The cell shows '+(t[0]===finRef?money(v):plain(v))+'.';}
+    else fb.textContent='Your formula gives '+(t[0]===finRef?money(v):plain(v))+'. Check which cells you used.';}
+  bs[0].addEventListener('click',check);inp.addEventListener('keydown',function(e){if(e.key==='Enter')check();});
+  bs[1].addEventListener('click',function(){fb.className='fb';fb.innerHTML='One answer: <span class="f">'+esc(t[5])+'</span>';});
+  fh.appendChild(box);});
+
+/* ---------- quiz ---------- */
+var quiz=[
+ ['What must every formula start with?',['A letter','The equals sign (=)','A number','A bracket'],1,'Formulas and functions always begin with =.'],
+ ['Which function finds the highest value in a range?',['MIN','SUM','MAX','AVERAGE'],2,'MAX finds the highest value. In the numerical model =MAX(B2:B13) gives 30.'],
+ ['In the numerical model, the annual total is 210 km and the target is 250 km. What does =F2-F1 show?',['460','40','210','250'],1,'250 − 210 = 40 km still to go.'],
+ ['What does =AVERAGE(B2:B13) give for the distances?',['17.5','210','30','12'],0,'210 ÷ 12 months = 17.5 km.'],
+ ['The build total is $709 and the staff build cost is $150. What is the total cost?',['$559','$799','$859','$150'],2,'=B11+D1 → 709 + 150 = $859.'],
+ ['The retail price is $799 and the total cost is $859. What happens?',['A profit of $60','A loss of $60','No profit and no loss','A profit of $859'],1,'799 − 859 = −60, so the shop makes a loss.'],
+ ['Which of these is a what if scenario?',['Typing =SUM(B2:B13)','What if the staff build cost could be reduced?','Printing the spreadsheet','Naming column A'],1,'A what if scenario changes a value to see what might happen.'],
+ ['Which tool adjusts a variable until a desired outcome is created?',['Goal seek','SUM','MIN','Equals sign'],0,'Goal seek works backwards from the answer you want.'],
+ ['Why is a wholesale price cheaper than a retail price?',['Wholesalers sell only one item at a time','Retail companies buy lots of stock','It includes the cost of a shop and staff','Consumers buy directly from wholesalers'],1,'Retail companies buy lots of stock, such as fifty computers instead of one.'],
+ ['Who buys products at a retail price?',['Retail companies buying stock','Consumers like us','Wholesalers','Factories'],1,'Retailers sell directly to us, the consumers, at a retail price.']
+];
+var qb=$('#quizBox'),score=0,answered=0;
+function buildQuiz(){qb.innerHTML='';score=0;answered=0;updScore();
+  quiz.forEach(function(q,i){var box=el('div',{'class':'qq'},'<p><b>'+(i+1)+'.</b> '+esc(q[0])+'</p><div class="opts"></div><p class="why" hidden></p>');var o=$('.opts',box);
+    q[1].forEach(function(t,j){var b=el('button',{'class':'opt',type:'button'},esc(t));b.addEventListener('click',function(){
+      $$('.opt',o).forEach(function(x,k){x.disabled=true;if(k===q[2])x.classList.add('right');});
+      if(j!==q[2])b.classList.add('wrong');else score++;answered++;var w=$('.why',box);w.hidden=false;w.textContent=(j===q[2]?'Correct. ':'Not quite. ')+q[3];updScore();});o.appendChild(b);});
+    qb.appendChild(box);});}
+function updScore(){$('#quizScore').textContent='Score: '+score+' / '+answered+(answered===quiz.length?'  —  finished!':'  ('+(quiz.length-answered)+' left)');}
+$('#quizReset').addEventListener('click',buildQuiz);buildQuiz();
+
+/* ---------- laptop tasks ---------- */
+var tasks=[
+ {n:'Task 1',t:'Build the numerical model',intro:'Recreate the running distance model from A5 in your spreadsheet software.',
+  steps:['Type <b>Month</b> in A1 and <b>Distance</b> in B1.','Type the months Jan to Dec in cells A2 to A13.','Type the distances in B2 to B13: 5, 5, 10, 10, 15, 15, 20, 20, 25, 25, 30, 30.','Type the labels in D1 to D6: Annual total (km), Annual target (km), Distance remaining (km), Average (km), Lowest (km), Highest (km).','In F2 type <b>250</b>. In F1, F3, F4, F5 and F6 write the formulas from A11.','Colour the answer cells red, like the book.'],
+  checks:[['Annual total (F1)',210],['Distance remaining (F3)',40],['Average (F4)',17.5],['Lowest (F5)',5],['Highest (F6)',30],['What if: change Dec (B13) to 70. Distance remaining?',0]],
+  ans:'F1 =SUM(B2:B13) → 210 · F3 =F2-F1 → 40 · F4 =AVERAGE(B2:B13) → 17.5 · F5 =MIN(B2:B13) → 5 · F6 =MAX(B2:B13) → 30 · With Dec = 70 the total becomes 250, so the distance remaining is 0.'},
+ {n:'Task 2',t:'Build the financial model',intro:'Recreate the computer shop model from A6.',
+  steps:['Type <b>Component</b> in A1 and <b>Price ($)</b> in B1.','Type the nine components and prices in A2 to B10 (CPU $75, Motherboard $90, Memory $50, Hard drive $100, Power supply unit $75, Video card $65, Case $79, Monitor $150, Keyboard &amp; mouse $25).','Type <b>Build total</b> in A11 and the SUM function in B11.','Type the labels Staff build cost, Total cost, Retail price and Profit in C1 to C4.','Type <b>150</b> in D1 and <b>799</b> in D3.','Write the formulas for D2 (total cost) and D4 (profit).','Format the price cells as Currency ($).'],
+  checks:[['Build total (B11)',709],['Total cost (D2)',859],['Profit (D4)',-60]],
+  ans:'B11 =SUM(B1:B10) → $709.00 · D2 =B11+D1 → $859.00 · D4 =D3-D2 → -$60.00 (a loss).'},
+ {n:'Task 3',t:'Test what if scenarios',intro:'Use your Task 2 model. Change the values for each scenario, write down the profit, then change the values back.',
+  steps:['<b>Scenario A:</b> the components are bought 10% cheaper. New prices: 67.50, 81, 45, 90, 67.50, 58.50, 71.10, 135, 22.50.','<b>Scenario B:</b> the staff build cost is reduced to $100 (change D1).','<b>Scenario C:</b> the retail price is increased to $899 (change D3).','Which scenario gives the biggest profit? Would you recommend it to the shop owner?'],
+  checks:[['Scenario A profit',10.9],['Scenario B profit',-10],['Scenario C profit',40]],
+  ans:'A: build total $638.10, total cost $788.10, profit $10.90 · B: total cost $809, profit -$10.00 · C: profit $40.00. Scenario C gives the biggest profit.'},
+ {n:'Task 4',t:'Use goal seek',intro:'Use the goal seek tool in Excel (Data → What-If Analysis → Goal Seek) or LibreOffice Calc (Tools → Goal Seek). Start from the book’s values.',
+  steps:['Click cell D4 (Profit).','Open Goal Seek. Set cell: <b>D4</b>. To value: <b>50</b>. By changing cell: <b>D1</b>. Click OK.','Write down the new staff build cost, then click Cancel to undo.','Now set D4 to <b>100</b> by changing <b>D3</b>. Write down the new retail price.'],
+  checks:[['Staff build cost for $50 profit',40],['Retail price for $100 profit',959]],
+  ans:'D1 becomes $40.00 (the book’s Goal Seeking Status box: Target value 50, Current value $50.00) · D3 becomes $959.00.'},
+ {n:'Task 5',t:'Make your own model: a milkshake shop',intro:'The book says a model can show the potential profit or loss of a new shop selling milkshakes. Build one with these starting values.',
+  steps:['A1 <b>Item</b>, B1 <b>Cost per milkshake ($)</b>. A2 to B5: Milk 0.40, Ice cream 0.60, Flavouring 0.20, Cup and straw 0.30.','A6 <b>Cost per milkshake</b>. In B6 use SUM to add B2 to B5.','D1 Selling price → E1 <b>3.00</b>. D2 Milkshakes sold per day → E2 <b>40</b>.','D3 Money taken → E3 <span class="f">=E1*E2</span>','D4 Ingredient costs → E4 <span class="f">=B6*E2</span>','D5 Shop costs per day → E5 <b>30</b>.','D6 Profit → E6 <span class="f">=E3-E4-E5</span>','What if: change E2 to 60 milkshakes. What is the profit?','Goal seek: set E6 to 50 by changing E1. What selling price is needed?'],
+  checks:[['Cost per milkshake (B6)',1.5],['Money taken (E3)',120],['Profit (E6)',30],['Profit if 60 are sold',60],['Selling price for $50 profit',3.5]],
+  ans:'B6 =SUM(B2:B5) → 1.50 · E3 → 120 · E4 → 60 · E6 → 30 · With 60 sold: 180 − 90 − 30 = 60 · Goal seek price: $3.50.'},
+ {n:'Extension',t:'A family weekly spending model',intro:'Families sometimes record their weekly spending to plan ahead and save money. Make your own model using made-up values.',
+  steps:['List 6 spending items (for example food, bus fares, electricity) with a cost for each.','Use SUM for the weekly total, AVERAGE for the average cost, and MAX and MIN for the biggest and smallest items.','Add a weekly budget and a formula for the money left over.','Try a what if: what if the food cost goes up by $10? Then use goal seek to find the food cost that leaves $20 spare.'],
+  checks:[],ans:''}
+];
+var th=$('#tasks');
+tasks.forEach(function(t,ti){var box=el('div',{'class':'task'});
+  var h='<div class="tt"><span class="pill">'+t.n+'</span><h3>'+esc(t.t)+'</h3></div><p>'+t.intro+'</p><ol class="steps">'+t.steps.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ol>';
+  if(t.checks.length){h+='<span class="label">Check your answers</span><div style="display:grid;gap:8px">';
+    t.checks.forEach(function(c,ci){h+='<div class="checkrow"><label for="tk'+ti+'_'+ci+'" style="min-width:min(100%,300px)">'+esc(c[0])+'</label><input class="txt" type="number" step="any" id="tk'+ti+'_'+ci+'" data-a="'+c[1]+'"><span class="fb"></span></div>';});
+    h+='</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" type="button" data-tk>Check</button></div><details class="ans"><summary>Show worked answers</summary>'+esc(t.ans)+'</details>';}
+  box.innerHTML=h;th.appendChild(box);
+  var b=$('[data-tk]',box);if(b)b.addEventListener('click',function(){$$('input[data-a]',box).forEach(function(i){var f=i.nextElementSibling,v=parseFloat(i.value);
+    if(isNaN(v)){f.className='fb';f.textContent='';return;}var ok=near(v,parseFloat(i.dataset.a));f.className='fb '+(ok?'ok':'bad');f.textContent=ok?'Correct':'Check your formula';});});});
+
+/* ---------- success criteria ---------- */
+var scs=$$('#scList input');
+function scUpd(){var n=scs.filter(function(c){return c.checked}).length;$('#scMeter').style.width=(n/scs.length*100)+'%';$('#scText').textContent=n+' of '+scs.length+' ticked'+(n===scs.length?'. Great work today!':'');}
+scs.forEach(function(c){if(store('sm-'+c.id)==='1')c.checked=true;c.addEventListener('change',function(){store('sm-'+c.id,c.checked?'1':'0');scUpd();});});scUpd();
+
+window.__sm={evalFormula:evalFormula,numModel:numModel,finModel:finModel,quiz:quiz};
+})();
+</script>
+<script>
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var sv=Element.prototype.scrollIntoView;Element.prototype.scrollIntoView=function(){};
+var T=window.__sm;
+// function machine
+var fm=$('.fm[data-fn="SUM"]');if(fm)fm.click();
+// spot variables
+$$('#varSpot .sitem').forEach(function(d){if(d.dataset.a==='1')$('.sortbtn',d).click();});$('#varCheck').click();
+// what if log
+['cheaper','staff','retail','reset'].forEach(function(k){$('[data-wi="'+k+'"]').click();});
+// goal seek demo (book screenshot)
+$('#gsRun').click();$('#gsUndo').click();$('#gsRun').click();
+$('#gsResult').textContent+='\n\n(Teacher copy: this matches the book’s Goal Seeking Status box.)';
+$('#gsUndo').click();$('#gsRun').click();
+// goal seek challenges
+$$('[data-gc]').forEach(function(b){$('#'+b.dataset.gc).value=b.dataset.a;b.click();});
+$$('#goalseek details.ans').forEach(function(d){d.open=true});
+// retail/wholesale
+$$('#rwSort .sitem').forEach(function(d){$('.sortbtn[data-v="'+d.dataset.a+'"]',d).click();});$('#rwCheck').click();
+// blanks
+$('#blShow').click();$('#blCheck').click();
+// formulas
+$$('#ftasks .ftask').forEach(function(box){var bs=$$('button',box);bs[1].click();var f=$('.fb .f',box).textContent;$('input',box).value=f;bs[0].click();});
+// quiz
+$$('#quizBox .qq').forEach(function(q,i){$$('.opt',q)[T.quiz[i][2]].click();});
+// laptop tasks
+$$('#tasks .task').forEach(function(t){$$('input[data-a]',t).forEach(function(i){i.value=i.dataset.a});var b=$('[data-tk]',t);if(b)b.click();$$('details.ans',t).forEach(function(d){d.open=true});});
+Element.prototype.scrollIntoView=sv;
+// undo goal seek so the financial model shows the book's values
+$('#gsUndo').click();
+$('#gsResult').textContent='Goal Seeking with Cell D4\nfound a solution.\n\n   Target value: 50\n   Current value: $50.00\n\nD1 (Staff build cost) changed from $150.00 to $40.00.\n\n(Teacher copy: click OK to run it on the model.)';
+window.scrollTo(0,0);
+})();
+</script>
+
+</body>
+</html>

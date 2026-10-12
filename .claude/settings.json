@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk -F/ '{print $1\"/\"$2}')",
+      "mcp__claude-in-chrome__tabs_context_mcp"
+    ]
+  }
+}

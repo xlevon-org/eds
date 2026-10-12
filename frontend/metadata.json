@@ -1,0 +1,6 @@
+{
+  "name": "ScribeHow Workspace — Student Handbook Studio",
+  "description": "End-to-end ScribeHow-style workspace for educators and teams to capture, generate, maintain, edit, and export printable PDF student handbooks with Clean Architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
