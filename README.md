@@ -52,11 +52,13 @@ cp backend/.env.example backend/.env # then fill values
 npm --prefix backend run dev         # http://localhost:5000
 
 # python worker
-python -m venv worker/.venv
-worker/.venv/Scripts/python -m pip install -r worker/requirements.txt
-cp worker/.env.example worker/.env
-worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir worker
+npm run worker:setup                 # creates worker/.venv + installs deps
+cp worker/.env.example worker/.env   # then set WORKER_API_KEY and an AI provider
+npm run worker:dev                   # http://localhost:8000
 ```
+
+> The npm worker scripts use Windows venv paths (`worker\.venv\Scripts\python`); on macOS/Linux
+> use `worker/.venv/bin/python` directly.
 
 Never commit `.env*` files or credentials; only `.env.example` templates are tracked.
 

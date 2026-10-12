@@ -10,6 +10,10 @@ Status: **bootable skeleton**. `/health` and `/provider/status` work; pipeline s
 ## Setup
 
 ```bash
+# from the repo root (Windows-safe, creates worker/.venv and installs deps):
+npm run worker:setup
+
+# or manually from worker/:
 python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt      # Windows
 # source .venv/bin/activate && pip install -r requirements.txt   # macOS/Linux
@@ -20,9 +24,10 @@ cp .env.example .env    # then set WORKER_API_KEY and an AI provider
 ## Run
 
 ```bash
+npm run worker:dev    # from repo root; Windows-safe
+
+# or directly (bash / macOS / Linux; on Windows cmd.exe use .venv\Scripts\python):
 .venv/Scripts/python -m uvicorn app.main:app --reload --port 8000   # from worker/
-# or from repo root:
-worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir worker
 ```
 
 ## Verify

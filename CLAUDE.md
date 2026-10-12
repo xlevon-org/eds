@@ -33,8 +33,9 @@ assests/         Reference output samples (student/instructor HTML + PDF)
 | backend | `npm run dev` | `node --watch src/server.js`. |
 | backend | `npm run start` | `node src/server.js`. |
 | backend | `npm run lint` | `node --check` on `src/`. |
-| worker | `python -m venv .venv` then `pip install -r requirements.txt` | Use the venv interpreter for all worker commands. |
-| worker | `uvicorn app.main:app --reload --port 8000 --app-dir worker` | From repo root. |
+| worker | `npm run worker:setup` | From repo root. Creates `worker/.venv` and installs `worker/requirements.txt`. Uses cmd-safe Windows venv paths. |
+| worker | `npm run worker:dev` | From repo root. uvicorn `--reload --port 8000 --app-dir worker`. |
+| worker | `python -m compileall worker/app` | Syntax check; use the venv interpreter (`worker/.venv/Scripts/python`). |
 
 ## Environment
 
