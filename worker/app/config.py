@@ -28,8 +28,19 @@ class Settings:
         self.worker_api_key = _env("WORKER_API_KEY")
         self.backend_base_url = _env("BACKEND_BASE_URL", "http://localhost:5000")
         self.mongodb_uri = _env("MONGODB_URI")
+
+        # Per-capability provider selection. There is no default: text comes from
+        # AI_PROVIDER; vision/image/embedding are explicit and never inherit a
+        # different modality implicitly.
         self.ai_provider = _env("AI_PROVIDER").lower()
         self.ai_model = _env("AI_MODEL")
+        self.ai_vision_provider = _env("AI_VISION_PROVIDER").lower()
+        self.ai_vision_model = _env("AI_VISION_MODEL")
+        self.ai_image_provider = _env("AI_IMAGE_PROVIDER").lower()
+        self.ai_image_model = _env("AI_IMAGE_MODEL")
+        self.ai_embed_provider = _env("AI_EMBED_PROVIDER").lower()
+        self.ai_embed_model = _env("AI_EMBED_MODEL")
+
         self.artifacts_dir = WORKER_ROOT / _env("ARTIFACTS_DIR", "artifacts")
         self.provider_keys = {
             "gemini": _env("GEMINI_API_KEY"),
@@ -37,11 +48,51 @@ class Settings:
             "anthropic": _env("ANTHROPIC_API_KEY"),
         }
         self.weasyprint_base_url = _env("WEASYPRINT_BASE_URL")
+        self.kb_chunk_tokens = _env_int("KB_CHUNK_TOKENS", 400)
+        self.kb_top_k = _env_int("KB_TOP_K", 6)
+        self.pdf_render_enabled = _env("PDF_RENDER_ENABLED", "true").lower() not in (
+            "0",
+            "false",
+            "no",
+        )
+        # When true, a document whose fit preflight still reports error-level
+        # overflow after auto-fit is surfaced as a fit warning (never a silent pass).
+        self.fit_strict = _env("FIT_STRICT", "false").lower() in ("1", "true", "yes")
 
 
 settings = Settings()
 
 
+def capability_provider(capability: str) -> str:
+    """Resolve the explicitly configured provider for a capability (or '')."""
+    if capability == "text":
+        return settings.ai_provider
+    if capability == "vision":
+        return settings.ai_vision_provider
+    if capability == "image":
+        return settings.ai_image_provider
+    if capability == "embedding":
+        return settings.ai_embed_provider
+    return ""
+
+
+def capability_model(capability: str) -> str:
+    if capability == "text":
+        return settings.ai_model
+    if capability == "vision":
+        return settings.ai_vision_model
+    if capability == "image":
+        return settings.ai_image_model
+    if capability == "embedding":
+        return settings.ai_embed_model
+    return ""
+
+
 def is_configured() -> bool:
-    """True only when a provider is selected AND its key is present."""
-    return bool(settings.ai_provider and settings.provider_keys.get(settings.ai_provider))
+    """True only when the text provider is selected AND its key is present (or it is the stub)."""
+    provider = capability_provider("text")
+    if not provider:
+        return False
+    if provider == "stub":
+        return True
+    return bool(settings.provider_keys.get(provider))

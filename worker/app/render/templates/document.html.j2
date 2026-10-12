@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{ doc.title | default('Document') }}</title>
+<style>{{ tokens_css }}</style>
+</head>
+<body class="up-doc tighten-{{ tighten | default(0) }}">
+{% macro render_component(n) %}
+  {%- set t = n.type -%}
+  {%- set pr = n.props or {} -%}
+  {%- if t == 'Heading' -%}
+    <h{{ pr.level | default(2) }}>{{ pr.text | default('') }}</h{{ pr.level | default(2) }}>
+  {%- elif t == 'Paragraph' -%}
+    <p>{{ pr.text | default('') }}</p>
+  {%- elif t == 'RichText' -%}
+    <div class="prose">{{ pr.html | default(pr.text | default('')) }}</div>
+  {%- elif t == 'BulletList' -%}
+    <ul>{% for it in pr['items'] | default([]) %}<li>{{ it }}</li>{% endfor %}</ul>
+  {%- elif t == 'NumberedList' -%}
+    <ol>{% for it in pr['items'] | default([]) %}<li>{{ it }}</li>{% endfor %}</ol>
+  {%- elif t == 'CalloutBox' -%}
+    <div class="callout {{ pr.intent | default('info') }}">
+      {% if pr.title %}<div class="callout-title">{{ pr.title }}</div>{% endif %}
+      <div>{{ pr.text | default('') }}</div>
+    </div>
+  {%- elif t in ('GridContainer', 'ColumnStack') -%}
+    <div class="grid cols-{{ pr.cols | default(2) }}">
+      {% for c in n.children | default([]) %}{{ render_component(c) }}{% endfor %}
+    </div>
+  {%- elif t in ('TableBlock', 'RubricTable') -%}
+    <table>
+      {% if pr.headers %}<thead><tr>{% for h in pr.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>{% endif %}
+      <tbody>{% for row in pr.rows | default([]) %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    </table>
+  {%- elif t == 'MediaAssetBlock' -%}
+    <figure>
+      {% if pr.src %}<img src="{{ pr.src }}" alt="{{ pr.alt | default('') }}" />{% else %}
+      <div class="media-placeholder">{{ pr.alt | default('Image placeholder') }}{% if pr.prompt %}<div class="caption">prompt: {{ pr.prompt }}</div>{% endif %}</div>{% endif %}
+      {% if pr.caption %}<figcaption>{{ pr.caption }}</figcaption>{% endif %}
+    </figure>
+  {%- elif t == 'Toc' -%}
+    <div class="toc">
+      <div class="callout-title">{{ pr.title | default('Table of contents') }}</div>
+      {% for it in pr['items'] | default([]) %}
+      <div class="toc-item" style="padding-left:{{ (it.level - 1) * 14 }}px">
+        <span>{{ it.text }}</span><span class="dots"></span><span></span>
+      </div>
+      {% endfor %}
+    </div>
+  {%- elif t == 'CoverContainer' -%}
+    <div class="cover">
+      {% if pr.logoText %}<div class="badge">{{ pr.logoText }}</div>{% endif %}
+      <h1>{{ pr.title | default(doc.title | default('Document')) }}</h1>
+      {% if pr.subtitle %}<div class="subtitle">{{ pr.subtitle }}</div>{% endif %}
+      {% if pr.meta %}<div class="meta">{{ pr.meta }}</div>{% endif %}
+    </div>
+  {%- elif t == 'Divider' -%}
+    <hr />
+  {%- elif t == 'Spacer' -%}
+    <div style="height:{{ pr.heightPx | default(16) }}px"></div>
+  {%- elif t == 'PageBreak' -%}
+    <div class="page-break"></div>
+  {%- elif t == 'ObjectiveList' -%}
+    <div class="objectives">
+      <div class="callout-title">{{ pr.title | default('Learning objectives') }}</div>
+      <ul>{% for it in pr['items'] | default([]) %}<li>{{ it }}</li>{% endfor %}</ul>
+    </div>
+  {%- elif t == 'Glossary' -%}
+    <div class="glossary">
+      <div class="callout-title">{{ pr.title | default('Keywords and definitions') }}</div>
+      <table><tbody>
+      {% for term in pr['items'] | default([]) %}<tr><td><strong>{{ term.term }}</strong></td><td>{{ term.definition }}</td></tr>{% endfor %}
+      </tbody></table>
+    </div>
+  {%- elif t == 'QuestionItem' -%}
+    <div class="question">
+      <p><span class="qnum">{{ pr.number | default('') }}</span>{{ pr.text | default('') }}
+      {% if pr.marks %}<span class="badge">{{ pr.marks }} marks</span>{% endif %}</p>
+      {% if pr.options %}<ol type="a">{% for o in pr.options %}<li>{{ o }}</li>{% endfor %}</ol>{% endif %}
+    </div>
+  {%- elif t == 'AnswerKey' -%}
+    <div class="answer-key">
+      <div class="callout-title">{{ pr.title | default('Answer key') }}</div>
+      <ul>{% for it in pr['items'] | default([]) %}<li>{{ it }}</li>{% endfor %}</ul>
+    </div>
+  {%- elif t == 'CodeBlock' -%}
+    <pre><code>{{ pr.code | default('') }}</code></pre>
+  {%- else -%}
+    <div class="unknown" data-type="{{ t }}">[unsupported component: {{ t }}]</div>
+  {%- endif -%}
+{% endmacro %}
+<div class="page">
+{% for section in doc.sections %}
+  <section class="section" data-layout="{{ section.layoutType | default('standard') }}">
+    {% for comp in section.components %}{{ render_component(comp) }}{% endfor %}
+    {% if section.pageRules and section.pageRules.pageBreakAfter %}<div class="page-break"></div>{% endif %}
+  </section>
+{% endfor %}
+</div>
+</body>
+</html>

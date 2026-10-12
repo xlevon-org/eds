@@ -21,3 +21,11 @@ class StageNotImplemented(WorkerError):
     def __init__(self, stage: str) -> None:
         super().__init__(f"Pipeline stage '{stage}' is not implemented yet.")
         self.stage = stage
+
+
+class ValidationError(WorkerError):
+    status_code = 422
+
+
+class PdfUnavailable(WorkerError):
+    status_code = 503
