@@ -18,7 +18,7 @@ Three independent projects under one repo (no npm workspaces):
 |---|---|---|
 | `frontend/` | React 19 + Vite 8 + TypeScript + Tailwind v4 | Existing AI-Studio UI, **kept as-is**. Clean Architecture: `domain` / `application` / `infrastructure` / `presentation`. |
 | `backend/` | Node 24 ESM + Express 5 + Mongoose 8 | Public API + orchestration: auth, projects, upload, template registry, job records, SSE progress relay, artifact serving. |
-| `python-worker/` | Python 3.14 + FastAPI | Agentic generation + rendering. The **only** place AI and rendering happen. |
+| `worker/` | Python 3.14 + FastAPI | Agentic generation + rendering. The **only** place AI and rendering happen. |
 | `assests/` | — | Sample generated handbooks (student + instructor HTML/PDF), the output reference. |
 
 ## Agreed decisions
@@ -45,7 +45,7 @@ Three independent projects under one repo (no npm workspaces):
 10. **Student vs instructor variants** are separate template branches; the instructor copy adds a
     teacher answer key.
 
-## Generation pipeline (python-worker)
+## Generation pipeline (worker)
 
 `intake -> inspect_materials -> plan_content -> fill_template -> render_html -> render_pdf`
 
@@ -55,7 +55,7 @@ progress event the backend relays to the frontend. The stages are stubs in this 
 ## Environment handling
 
 Secrets live only in gitignored `.env*` files; tracked templates are `backend/.env.example`,
-`python-worker/.env.example`, `frontend/.env.example`.
+`worker/.env.example`, `frontend/.env.example`.
 
 - backend vs worker share `WORKER_API_KEY`.
 - In development the backend boots with no DB/Cloudinary configured (warns, continues).

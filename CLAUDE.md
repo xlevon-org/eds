@@ -18,7 +18,7 @@ only holds convenience scripts.
 ```
 frontend/        React 19 + Vite 8 + TypeScript + Tailwind v4 SPA (JavaScript/TS), port 3000
 backend/         Node 24 (ESM) + Express 5 + Mongoose 8 API + orchestration, port 5000
-python-worker/   Python 3.14 + FastAPI agentic generation + HTML/PDF rendering, port 8000
+worker/   Python 3.14 + FastAPI agentic generation + HTML/PDF rendering, port 8000
 assests/         Reference output samples (student/instructor HTML + PDF)
 ```
 
@@ -33,18 +33,18 @@ assests/         Reference output samples (student/instructor HTML + PDF)
 | backend | `npm run dev` | `node --watch src/server.js`. |
 | backend | `npm run start` | `node src/server.js`. |
 | backend | `npm run lint` | `node --check` on `src/`. |
-| python-worker | `python -m venv .venv` then `pip install -r requirements.txt` | Use the venv interpreter for all worker commands. |
-| python-worker | `uvicorn app.main:app --reload --port 8000 --app-dir python-worker` | From repo root. |
+| worker | `python -m venv .venv` then `pip install -r requirements.txt` | Use the venv interpreter for all worker commands. |
+| worker | `uvicorn app.main:app --reload --port 8000 --app-dir worker` | From repo root. |
 
 ## Environment
 
 Secrets live only in untracked `.env*` files. Tracked templates: `backend/.env.example`,
-`python-worker/.env.example`, `frontend/.env.example`.
+`worker/.env.example`, `frontend/.env.example`.
 
 - backend: `PORT`, `NODE_ENV`, `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES`, `CORS_ALLOWED_ORIGINS`,
   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_FOLDER`,
   `MAX_UPLOAD_MB`, `WORKER_BASE_URL`, `WORKER_API_KEY`, `PUBLIC_BASE_URL`.
-- python-worker: `WORKER_PORT`, `WORKER_API_KEY`, `BACKEND_BASE_URL`, `MONGODB_URI`, `AI_PROVIDER`,
+- worker: `WORKER_PORT`, `WORKER_API_KEY`, `BACKEND_BASE_URL`, `MONGODB_URI`, `AI_PROVIDER`,
   provider keys (`GEMINI_API_KEY` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY`), `ARTIFACTS_DIR`,
   `CLOUDINARY_*`, `WEASYPRINT_*`.
 - frontend: the app currently reads **no** runtime env vars (verified: no `import.meta.env` /
@@ -93,7 +93,7 @@ Use cases in `application/use-cases/HandbookUseCases.ts`. Adapters in `infrastru
 - The backend serves `GET /health` and empty stubs (`handbooks`/`folders`), and `jobs` is 501: no
   auth, no persistence, no generation, no upload. The MongoDB connection **works** from this machine
   against the cluster in `backend/.env` (Atlas allow-list permits this IP).
-- The python-worker boots; `/health` and `/provider/status` work, `/jobs` is 501, and pipeline
+- The worker boots; `/health` and `/provider/status` work, `/jobs` is 501, and pipeline
   stages are stubs. PDF rendering (WeasyPrint) is unverified on Windows (needs native Pango/GTK).
 - **Port conflicts (other running projects):** `D:\Per\up\backend` (`node server.js`, the old
   ClzMate API) holds **port 5000**, and `D:\Per\te\app\frontend` (Next.js) holds **port 3000**.

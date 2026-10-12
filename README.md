@@ -17,7 +17,7 @@ sections), and the AI fills it from the uploaded materials.
 |---|---|---|
 | `frontend/` | React 19, Vite 8, TypeScript, Tailwind v4 | Existing AI-Studio UI ("up Workspace"), kept as-is. Clean Architecture (`src/domain`, `src/application`, `src/infrastructure`, `src/presentation`). |
 | `backend/` | Node 24 (ESM), Express 5, Mongoose 8 | Public API, auth, projects, material upload, template registry, job orchestration, artifact serving. |
-| `python-worker/` | Python, FastAPI | Agentic generation: inspect materials -> plan content -> fill template -> render HTML + PDF (student/instructor variants). |
+| `worker/` | Python, FastAPI | Agentic generation: inspect materials -> plan content -> fill template -> render HTML + PDF (student/instructor variants). |
 | `assests/` | — | Sample generated handbooks (student + instructor HTML/PDF) used as the output reference. |
 | `.claude/`, `.agents/`, `.remember/`, `.impeccable/` | — | Agent instructions and tooling (see `CLAUDE.md`). |
 
@@ -28,7 +28,7 @@ frontend (React 19 + TS)  --HTTP-->  backend/ (Express 5 API + orchestration)
                                           |  Mongo (metadata)   Cloudinary (media)
                                           |  enqueue generation job
                                           v
-                                    python-worker/ (FastAPI, agentic pipeline)
+                                    worker/ (FastAPI, agentic pipeline)
                                           |  AI provider (configurable, connection-checked)
                                           v
                                     HTML (Jinja2) --> PDF (WeasyPrint)
@@ -52,10 +52,10 @@ cp backend/.env.example backend/.env # then fill values
 npm --prefix backend run dev         # http://localhost:5000
 
 # python worker
-python -m venv python-worker/.venv
-python-worker/.venv/Scripts/python -m pip install -r python-worker/requirements.txt
-cp python-worker/.env.example python-worker/.env
-python-worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir python-worker
+python -m venv worker/.venv
+worker/.venv/Scripts/python -m pip install -r worker/requirements.txt
+cp worker/.env.example worker/.env
+worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir worker
 ```
 
 Never commit `.env*` files or credentials; only `.env.example` templates are tracked.

@@ -1,4 +1,4 @@
-# up python-worker — agentic generation + rendering
+# up worker — agentic generation + rendering
 
 FastAPI service that turns instructor materials into **student** and **instructor** handbooks as
 interactive **HTML** and print **PDF**. It is internal: the Express backend is the only caller and
@@ -20,9 +20,9 @@ cp .env.example .env    # then set WORKER_API_KEY and an AI provider
 ## Run
 
 ```bash
-.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000   # from python-worker/
+.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000   # from worker/
 # or from repo root:
-python-worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir python-worker
+worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir worker
 ```
 
 ## Verify

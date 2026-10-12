@@ -1,4 +1,4 @@
-# up python-worker — core runtime (agentic generation + HTML rendering).
+# up worker — core runtime (agentic generation + HTML rendering).
 # PDF rendering needs native libraries (Pango/GTK on Windows); see requirements-render.txt.
 
 fastapi>=0.115

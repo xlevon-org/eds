@@ -30,7 +30,8 @@ env/
 
 # Generated handbook artifacts (regenerable)
 generated/
-python-worker/artifacts/
+worker/artifacts/*
+!worker/artifacts/.gitkeep
 backend/tmp/
 
 # Editors / OS

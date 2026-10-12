@@ -14,7 +14,7 @@
     "dev:backend": "npm --prefix backend run dev",
     "start:backend": "npm --prefix backend run start",
     "lint:backend": "npm --prefix backend run lint",
-    "worker:setup": "python -m venv python-worker/.venv && python-worker/.venv/Scripts/python -m pip install -r python-worker/requirements.txt",
-    "worker:dev": "python-worker/.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000 --app-dir python-worker"
+    "worker:setup": "python -m venv worker/.venv && worker\\.venv\\Scripts\\python -m pip install -r worker/requirements.txt",
+    "worker:dev": "worker\\.venv\\Scripts\\python -m uvicorn app.main:app --reload --port 8000 --app-dir worker"
   }
 }

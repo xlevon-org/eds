@@ -1,4 +1,4 @@
-"""Worker settings, loaded from environment / python-worker/.env."""
+"""Worker settings, loaded from environment / worker/.env."""
 
 import os
 from pathlib import Path

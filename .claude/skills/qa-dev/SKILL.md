@@ -12,7 +12,7 @@ Independent verifier for `up`. There is **no automated test suite yet**; verific
 
 1. frontend: `npm --prefix frontend run lint` clean (`tsc --noEmit`) and `npm --prefix frontend run build` succeeds.
 2. backend: server boots and `GET http://localhost:5000/health` returns `{ "success": true, ... }`.
-3. python-worker: `python -m compileall python-worker/app` succeeds and importing `app.main` works.
+3. worker: `python -m compileall worker/app` succeeds and importing `app.main` works.
 4. The specific behavior was exercised against running services (real HTTP request), not just read.
 
 ## Assumption / verification format (project standard)
@@ -29,7 +29,7 @@ duplicate/conflict, trashed/deleted entities.
 
 ## Known gaps (do not assume these work)
 
-- backend and python-worker are skeletons: no auth, persistence, upload, or generation.
+- backend and worker are skeletons: no auth, persistence, upload, or generation.
 - Frontend uses localStorage and jsPDF; not wired to the backend.
 - Frontend API client paths (`/api/handbooks`) differ from the backend (`/api/v1`).
 - WeasyPrint on Windows may lack native Pango/GTK; Python 3.14 may lack wheels.

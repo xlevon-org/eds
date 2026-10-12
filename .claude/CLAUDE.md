@@ -18,7 +18,7 @@ Project facts, commands and architecture live in the root `CLAUDE.md`. This file
 ## Code style
 - `frontend/` is **TypeScript** (React 19, Vite 8, Tailwind v4). Use TS types; do not add `.js` components.
 - `backend/` is **modern JavaScript, ESM** (`import`/`export`, `"type": "module"`). No TypeScript there.
-- `python-worker/` is typed Python where useful; keep pipeline stages pure and individually testable.
+- `worker/` is typed Python where useful; keep pipeline stages pure and individually testable.
 - No comments unless the code cannot express the intent.
 - Descriptive names, booleans with auxiliary verbs (`isLoading`, `hasError`).
 - Follow existing layer boundaries (frontend: domain / application / infrastructure / presentation; backend: routes / controllers / services / models / middleware).

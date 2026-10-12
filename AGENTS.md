@@ -12,7 +12,7 @@ Repository shape:
 
 - `backend/` — Express 5 API + orchestration (Node ESM).
 - `frontend/` — React 19 + Vite + TypeScript SPA (existing AI Studio app, kept as-is).
-- `python-worker/` — FastAPI agentic generation + HTML/PDF rendering.
+- `worker/` — FastAPI agentic generation + HTML/PDF rendering.
 
 Verification gate: there is no automated test suite. Claim "works" only after the touched app builds
 (`npm run build` in `frontend/`), `npm run lint` is clean (frontend = `tsc --noEmit`), the backend
