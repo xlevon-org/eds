@@ -16,6 +16,7 @@ import { HandbookEditorView } from './presentation/components/HandbookEditorView
 import { CaptureRecorderModal } from './presentation/components/CaptureRecorderModal';
 import { PrintablePreviewModal } from './presentation/components/PrintablePreviewModal';
 import { Handbook, HandbookFolder } from './domain/entities/Handbook';
+import { StudioApp } from './presentation/studio/StudioApp';
 import {
   Sheet,
   SheetContent,
@@ -281,11 +282,47 @@ const WorkspaceShell: React.FC = () => {
 };
 
 export default function App() {
+  const [mode, setMode] = React.useState<'studio' | 'legacy'>(() => {
+    try {
+      return (localStorage.getItem('up_app_mode') as 'studio' | 'legacy') || 'studio';
+    } catch {
+      return 'studio';
+    }
+  });
+
+  const choose = (next: 'studio' | 'legacy') => {
+    setMode(next);
+    try {
+      localStorage.setItem('up_app_mode', next);
+    } catch {
+      /* ignore */
+    }
+  };
+
   return (
     <ThemeProvider>
-      <DependencyProvider>
-        <WorkspaceShell />
-      </DependencyProvider>
+      <div className="flex items-center gap-2 border-b border-border bg-background px-4 py-1.5 text-xs">
+        <span className="font-semibold">up</span>
+        <button
+          onClick={() => choose('studio')}
+          className={`rounded px-2 py-0.5 ${mode === 'studio' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+        >
+          Studio
+        </button>
+        <button
+          onClick={() => choose('legacy')}
+          className={`rounded px-2 py-0.5 ${mode === 'legacy' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+        >
+          Legacy workspace
+        </button>
+      </div>
+      {mode === 'studio' ? (
+        <StudioApp />
+      ) : (
+        <DependencyProvider>
+          <WorkspaceShell />
+        </DependencyProvider>
+      )}
     </ThemeProvider>
   );
 }
