@@ -42,3 +42,6 @@ Thumbs.db
 
 # Local logs
 *.log
+
+# Verification/test output (PRD download button / E2E scripts)
+atomic_system_architecture_prd.download.html

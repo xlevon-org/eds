@@ -32,7 +32,7 @@ assests/         Reference output samples (student/instructor HTML + PDF)
 | frontend | `npm run lint` | This is `tsc --noEmit` (type check); there is no ESLint config. |
 | backend | `npm run dev` | `node --watch src/server.js`. |
 | backend | `npm run start` | `node src/server.js`. |
-| backend | `npm run lint` | `node --check` on `src/`. |
+| backend | `npm run lint` | Syntax-checks every file in `src/` (via `scripts/lint.mjs`). |
 | worker | `npm run worker:setup` | From repo root. Creates `worker/.venv` and installs `worker/requirements.txt`. Uses cmd-safe Windows venv paths. |
 | worker | `npm run worker:dev` | From repo root. uvicorn `--reload --port 8000 --app-dir worker`. |
 | worker | `python -m compileall worker/app` | Syntax check; use the venv interpreter (`worker/.venv/Scripts/python`). |
@@ -47,10 +47,10 @@ Secrets live only in untracked `.env*` files. Tracked templates: `backend/.env.e
   `MAX_UPLOAD_MB`, `WORKER_BASE_URL`, `WORKER_API_KEY`, `PUBLIC_BASE_URL`.
 - worker: `WORKER_PORT`, `WORKER_API_KEY`, `BACKEND_BASE_URL`, `MONGODB_URI`, `AI_PROVIDER`,
   provider keys (`GEMINI_API_KEY` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY`), `ARTIFACTS_DIR`,
-  `CLOUDINARY_*`, `WEASYPRINT_*`.
-- frontend: the app currently reads **no** runtime env vars (verified: no `import.meta.env` /
-  `VITE_*` usage in `src/`). `frontend/.env.example` documents AI Studio runtime-injected vars
-  (`GEMINI_API_KEY`, `APP_URL`). `VITE_APP_BASE_URL` is **reserved** for when backend wiring lands.
+  `CLOUDINARY_*`, `WEASYPRINT_*`, `PDF_RENDER_ENABLED`, `FIT_STRICT`.
+- frontend: the **up Studio** reads `VITE_API_BASE` (defaults to `http://localhost:5000/api/v1`) in
+  `infrastructure/api/UpApiClient.ts`. `frontend/.env.example` also documents AI Studio runtime-injected
+  vars (`GEMINI_API_KEY`, `APP_URL`). The legacy workspace reads no runtime env vars.
 
 There is **no default AI provider**. `AI_PROVIDER` plus its key must be set, and the worker exposes a
 provider connection check; generation is refused while the provider is unconfigured or unreachable.
@@ -71,46 +71,76 @@ enqueue + status, artifact serving. The Express layer does **not** do AI or rend
 
 ## Python worker architecture (FastAPI)
 
-`app/main.py` exposes `/health`, `/provider/status`, and job endpoints. The pipeline is a sequence of
-stages (intake -> material inspection -> content plan -> template fill -> HTML render -> PDF render),
-each stage emitting progress events that the backend relays to the frontend over SSE/WebSocket.
+`app/main.py` exposes `/health`, `/provider/status`, `/jobs`, `/generate`, `/render/html`,
+`/render/pdf`, `/fit`, `/kb/extract`, and `/artifacts/{name}`. The pipeline is 8 stages
+(`intake → inspect_materials → retrieve → plan_content → fill_sections → generate_images →
+render_html → render_pdf`), each emitting progress events that the backend relays to the frontend
+over SSE.
 
-- HTML: Jinja2 templates. PDF: **WeasyPrint** (the sample assets were produced by `WeasyPrint 70.0`;
-  verified from PDF `/Producer` metadata), so no JavaScript runs at PDF time.
+- HTML: Jinja2 (`app/render/templates/document.html.j2`) + token/geometry CSS from
+  `html_renderer.build_tokens_css`. PDF: **headless Chromium via Playwright** (primary on Windows),
+  **WeasyPrint** fallback, **HTML-only degrade** with a reason. A `.page` div is a screen-only frame;
+  pagination is flow-based and the CSS `@page` rule (in `build_tokens_css`) is the single source of
+  page size/margins — Chromium honours the CSS margin over the `page.pdf` margin option (measured).
+  Page numbers use Chromium `display_header_footer` (Chromium ignores CSS `@page` margin boxes).
+- **Page-fit gate** (`app/render/fit.py`): always-on CSS hardening + a **DOM preflight**
+  (headless Chromium, every element vs the printable content box) + a **PyMuPDF** post-render
+  verification (page size ±0.5 mm, glyphs inside margins, no blank pages). The `render_html` stage
+  runs a bounded **auto-fit** loop (escalating `tighten`) until the preflight passes. Reports are
+  stored at `document.fidelity.fit = {html, pdf}` and surfaced in the Studio `FitBadge`.
 - Student vs instructor variants are separate template branches (the instructor copy adds a
   teacher answer key).
 
-## Frontend architecture (kept as-is)
+## Frontend architecture
 
-`src/{domain,application,infrastructure,presentation,architecture}` — a Clean Architecture
-"ScribeHow-style" handbook workspace. Domain: `domain/entities/Handbook.ts`,
-`domain/repositories/IHandbookRepository.ts`, `domain/errors/DomainError.ts` (`Result<T>`, `ErrorCode`).
-Use cases in `application/use-cases/HandbookUseCases.ts`. Adapters in `infrastructure/`
-(`api/HandbookApiClient.ts`, `pdf/JsPdfHandbookExporter.ts`, `persistence/LocalStorageHandbookRepository.ts`,
-`templates/CurriculumTemplateGenerator.ts`). DI via `presentation/context/DependencyContext.tsx`.
+Two surfaces in one SPA, toggled by `presentation/studio/AppMode` (persisted in localStorage key
+`up_app_mode`):
+
+1. **up Studio** (`src/presentation/studio/*`) — the backend-wired product: `TemplateBuilderView`
+   (geometry/tokens/sections/components + live preview with a fit badge), `GenerateView` (chat
+   workspace, side-by-side preview, in-place edit, revisions, fit badges + on-demand fit check),
+   `DocumentsView` (list + fit column), `KnowledgeBaseView`, `ProvidersView`, `FitBadge`. Talks to the
+   backend via `infrastructure/api/UpApiClient.ts` (`/api/v1`, Bearer token).
+2. **Legacy workspace** (`src/{domain,application,infrastructure,presentation,architecture}`) — a Clean
+   Architecture "ScribeHow-style" handbook workspace, kept as-is. Domain:
+   `domain/entities/Handbook.ts`, `domain/repositories/IHandbookRepository.ts`,
+   `domain/errors/DomainError.ts` (`Result<T>`, `ErrorCode`).
+   Use cases in `application/use-cases/HandbookUseCases.ts`. Adapters in `infrastructure/`
+   (`api/HandbookApiClient.ts`, `pdf/JsPdfHandbookExporter.ts`, `persistence/LocalStorageHandbookRepository.ts`,
+   `templates/CurriculumTemplateGenerator.ts`). DI via `presentation/context/DependencyContext.tsx`.
+   It persists to localStorage and is **not** wired to the backend (dead-end for product work).
 
 ## Known gaps (verified 2026-10-12; do not assume these work)
 
-- The backend serves `GET /health` and empty stubs (`handbooks`/`folders`), and `jobs` is 501: no
-  auth, no persistence, no generation, no upload. The MongoDB connection **works** from this machine
-  against the cluster in `backend/.env` (Atlas allow-list permits this IP).
-- The worker boots; `/health` and `/provider/status` work, `/jobs` is 501, and pipeline
-  stages are stubs. PDF rendering (WeasyPrint) is unverified on Windows (needs native Pango/GTK).
-- **Port conflicts (other running projects):** `D:\Per\up\backend` (`node server.js`, the old
-  ClzMate API) holds **port 5000**, and `D:\Per\te\app\frontend` (Next.js) holds **port 3000**.
-  Both are this project's default dev ports. Resolve before running the dev stack side by side.
-- The frontend still persists to **localStorage** (`DependencyContext.tsx` default) and exports PDF
-  client-side with jsPDF. It is **not** wired to the backend. `RemoteApiHandbookRepository` exists
-  but is only used by the verification script. The app reads no runtime env vars.
-- The frontend's API client (`HandbookApiClient.ts`) expects legacy paths `GET/PUT/DELETE /api/handbooks`
-  and `GET /api/folders`; the backend is versioned under `/api/v1`. The two contracts must be reconciled
-  before wiring.
-- The frontend domain model is a **click-step recorder** (`xPercent`/`yPercent` screen mockups). The
-  reference sample handbooks are richer interactive lesson pages (objectives, glossary, spreadsheets,
-  quiz, answer key). This product-model gap is **unresolved** (decision deferred).
-- WeasyPrint on Windows needs native Pango/GTK libraries; verify before relying on it.
+- The backend is **implemented and wired**: JWT auth, Mongoose models, template CRUD/validate/preview,
+  document generation + revisions/rollback/edit-block, jobs (polling + SSE relay), KB (sources/chunks/
+  tags/search), providers status, PRD download — all under `/api/v1`. `GET /health` →
+  `database:connected`. (See `atomic_system_architecture_prd.md` §24 for the verified list.)
+- The worker's 8 pipeline stages are **implemented** (not stubs) and were verified end to end with the
+  deterministic `AI_PROVIDER=stub` provider: HTML **and** PDF artifacts, Chromium PDF engine, and the
+  page-fit gate. PDF is **not** WeasyPrint on this machine — Chromium is primary (WeasyPrint needs
+  native Pango/GTK, which are absent here).
+- **Remaining PRD §24.2 gaps:** template publish/archive/sample/schema/export/import; document PUT/DELETE/
+  replace-part/regenerate-image; library view; job cancel/retry; worker `/kb/embed`, `/kb/search`,
+  `/edit-block`, `/image/generate`; Atlas Vector Search index (retrieval is a keyword proxy); no live
+  provider keys (real text/vision/image/embedding providers are implemented but unverified).
+- **Port conflicts (other running projects):** `D:\Per\up\backend` (the old ClzMate API) also uses
+  **port 5000**; `D:\Per\te` holds **port 3000**; another project holds **5173**. This project's dev
+  stack runs on backend **5000**, worker **8000**, and Vite dev on **127.0.0.1:5199** (the legacy shell
+  also uses 3000/5173 — see `CORS_ALLOWED_ORIGINS`). Free/choose ports before running several stacks.
+- The **legacy** handbook workspace still persists to **localStorage** and exports PDF client-side with
+  jsPDF; it is **not** wired to the backend. The new **up Studio** (`presentation/studio/*`) is the
+  backend-wired surface. `HandbookApiClient.ts` / `RemoteApiHandbookRepository.ts` are **dead code**
+  expecting legacy paths `GET/PUT/DELETE /api/handbooks` and must be retired before wiring.
+- The legacy frontend domain model is a **click-step recorder** (`xPercent`/`yPercent` screen mockups);
+  the reference sample handbooks are richer interactive lesson pages. The Studio replaces this with the
+  componentized template model; the legacy model stays unused (decision deferred).
+- WeasyPrint on Windows needs native Pango/GTK libraries; that is why Chromium is the primary PDF
+  engine here. Keep WeasyPrint as a fallback only where those libs exist.
 - Python 3.14 is very new; not all third-party wheels exist. Verify installs, do not assume.
-- No CI, no test suite, no Docker.
+- No CI, no Docker. There is no committed automated test suite, but the verification gate (frontend
+  build + `tsc --noEmit`, backend `npm run lint` over all `src/**`, `/health`, worker boot, plus API
+  and headless-UI E2E scripts) must pass for any change.
 
 ## Conventions
 
